@@ -40,7 +40,7 @@ print(x_train.shape[0], 'train samples')
 print(x_test.shape[0], 'test samples')
 print('y_train shape:', y_train.shape)
 
-model = keras.models.load_model("saved_models_svm/cifar10_ResNetSVM20v3_model.158.10.0.001.h5")
+model = keras.models.load_model("cifar10_ResNetSVM20v3_model.171.5.0.001.h5")
 scores = model.evaluate(x_test, keras.utils.to_categorical(y_test, 10), verbose=1)
 print('Test loss:', scores[0])
 print('Test accuracy:', scores[1])
@@ -94,7 +94,7 @@ def attack_wrapper(attack, name, gap=1, part=False):
 # try:
 #     with h5py.File("orig.h5", "r") as hf:
 #
-generate_orig("_cifar10_ResNetSVM20v3_model.158.10.0.001", x_test + x_train_mean, pred, y_test)
+generate_orig("_cifar10_ResNetSVM20v3_model.171.5.0.001", x_test + x_train_mean, pred, y_test)
 model_adv = foolbox.models.KerasModel(model, bounds=(-1, 1), preprocessing=((0, 0, 0), 1))
 
 attack_deep_fool_l2 = foolbox.attacks.DeepFoolL2Attack(model_adv)
@@ -117,12 +117,12 @@ attack_wrapper(attack_DFL_INF, 'DeepFool_L_INF', 10)
 attack_wrapper(attack_DFL_0, "DeepFool_L_0", 10)
 
 attack_wrapper(attack_LBFGSAttack, 'LBGFS', 10)
-# attack_wrapper(attack_IterGrad, "Iter_Grad", 10)
-# attack_wrapper(attack_IterGradSign, "Iter_GradSign", 10)
-#
-# attack_wrapper(attack_Local, "Local_Search", 10)
-# attack_wrapper(attack_Single_Pixel, "Single_Pixel", 10)
-#
-# attack_wrapper(attack_GaussianBlur, "Gaussian_Blur", 10)
+attack_wrapper(attack_IterGrad, "Iter_Grad", 10)
+attack_wrapper(attack_IterGradSign, "Iter_GradSign", 10)
+
+attack_wrapper(attack_Local, "Local_Search", 10)
+attack_wrapper(attack_Single_Pixel, "Single_Pixel", 10)
+
+attack_wrapper(attack_GaussianBlur, "Gaussian_Blur", 10)
 # attack_BoundaryAttack = foolbox.attacks.BoundaryAttack(model_adv)
 # attack_wrapper(attack_BoundaryAttack, "Boundary", 10)

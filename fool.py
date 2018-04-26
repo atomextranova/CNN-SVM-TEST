@@ -12,7 +12,6 @@ from keras import backend as K
 from keras.models import Model
 from keras.datasets import cifar10
 import numpy as np
-import deepfool
 import tensorflow as tf
 
 import foolbox
