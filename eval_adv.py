@@ -99,8 +99,8 @@ def generate_orig_selected(x, pred, y):
         hf.create_dataset('label', data=y)
 
 
-def read_orig():
-    with  h5py.File('orig.h5') as hf:
+def read_orig(name):
+    with  h5py.File("orig_" + name + ".h5", 'r') as hf:
         # value = list(hf.values())
         # print(value)
         return hf['orig'][:], hf['pred'][:], hf['label'][:]
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     # x_test, pred, y_test = read_orig()
     # x_test, pred, y_test = read_labeled_data(x_test, pred, y_test)
     # generate_orig_selected(x_test, pred, y_test)
-    img, pred, label = read_orig()
+    img, pred, label = read_orig('cifar10_ResNetSVM20v3_model.171.5.0.001')
 
     # choice = np.arange(img.shape[0], step=10)
     # img = np.take(img, choice)
