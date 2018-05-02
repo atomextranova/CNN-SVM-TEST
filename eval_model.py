@@ -39,7 +39,7 @@ print('x_train shape:', x_train.shape)
 print(x_train.shape[0], 'train samples')
 print(x_test.shape[0], 'test samples')
 print('y_train shape:', y_train.shape)
-model_name = "cifar10_ResNetSVM20v3_model.156.35.0.001"
+model_name = "cifar10_ResNetSVM20v3_model.028.25.0.0001"
 model = keras.models.load_model(model_name + ".h5")
 scores = model.evaluate(x_test, keras.utils.to_categorical(y_test, 10), verbose=1)
 print('Test loss:', scores[0])
@@ -94,7 +94,7 @@ def attack_wrapper(attack, name, gap=1, part=False):
 # try:
 #     with h5py.File("orig.h5", "r") as hf:
 #
-generate_orig("_cifar10_ResNetSVM20v3_model.028.25.0.0001", x_test + x_train_mean, pred, y_test)
+# generate_orig("_" , x_test + x_train_mean, pred, y_test)
 model_adv = foolbox.models.KerasModel(model, bounds=(-1, 1), preprocessing=((0, 0, 0), 1))
 
 attack_deep_fool_l2 = foolbox.attacks.DeepFoolL2Attack(model_adv)
