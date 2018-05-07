@@ -74,17 +74,17 @@ def lr_schedule(epoch):
     print('Learning rate: ', lr)
     return lr
 
-def resnet_svm_v1(input_shape, depth, reg, num_classes=10):
+def resnet_svm_v1(reg_l1, reg_l2, num_classes=10):
     base_model = keras.models.load_model("cifar10_ResNet20v1_model.194.h5")
     base_model.layers.pop()
     x = base_model.layers[-1].output
-    x = Dense(num_classes, activation='linear', name='predictions', kernel_regularizer=keras.regularizers.l1(reg))(x)
+    x = Dense(num_classes, activation='linear', name='predictions', kernel_regularizer=keras.regularizers.l1_l2(reg_l1, reg_l2))(x)
     model1 = Model(input=base_model.input, output=x)
     return model1
 
 
-def generate_model(reg):
-    model = resnet_svm_v1(input_shape=input_shape, depth=depth, reg=reg)
+def generate_model(l1, l2):
+    model = resnet_svm_v1(reg_l1=l1, reg_l2=l2)
 
     # model.compile(loss='categorical_crossentropy',
     #               optimizer=Adam(lr=lr_schedule(0)),
@@ -97,7 +97,7 @@ def generate_model(reg):
 
     # Prepare model model saving directory.
     save_dir = os.path.join(os.getcwd(), 'saved_models_svm')
-    model_name = 'cifar10_%s_model.{epoch:03d}.' % (model_type) + str(reg) +'.L1.0.001.h5'
+    model_name = 'cifar10_%s_model.{epoch:03d}.' % (model_type) + str(l1) + "." + str(l2) +'.L1.0.001.h5'
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
     filepath = os.path.join(save_dir, model_name)
@@ -115,7 +115,7 @@ def generate_model(reg):
                                    patience=5,
                                    min_lr=0.5e-6)
 
-    board = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=32, write_graph=True,
+    board = keras.callbacks.TensorBoard(log_dir='./logs/'+str(l1)+'/'+str(l2), histogram_freq=0, batch_size=32, write_graph=True,
                                         write_grads=False, write_images=False, embeddings_freq=0,
                                         embeddings_layer_names=None, embeddings_metadata=None)
 
@@ -171,7 +171,10 @@ def generate_model(reg):
     print('Test accuracy:', scores[1])
 
 
-# regulization = [0.25, 0.3, 0.35, 0.4, 0.15]
-regularization = [0.15, 0.3]
-for regu in regularization:
-    generate_model(regu)
+# regulizationszsezzzzzzzzzsasad
+# = [0.25, 0.3, 0.35, 0.4, 0.15]
+l1_list = [0.15, 0.2, 0.25, 0.3]
+l2_list = [0.5, 2, 5, 10, 15]
+for reg_l1 in l1_list:
+    for reg_l2 in l2_list:
+        generate_model(reg_l1, reg_l2)

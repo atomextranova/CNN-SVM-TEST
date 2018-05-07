@@ -68,7 +68,7 @@ def attack_wrapper(attack, name, gap=1, part=False):
         if adv_image is not None:
             adv.append(adv_image)
         else:
-            print("Invalid adv image. Appending original image.")
+            print("generate_svm.py adv image. Appending original image.")
             adv.append(x_test[i * gap])
             count += 1
     adv = np.array(adv, 'float32')
