@@ -173,8 +173,8 @@ def generate_model(l1, l2):
 
 # regulization
 # = [0.25, 0.3, 0.35, 0.4, 0.15]
-l1_list = [0.3]
-l2_list = [0.5, 2, 5, 10, 15]
+l1_list = [0.25]
+l2_list = [10, 15]
 for reg_l1 in l1_list:
     for reg_l2 in l2_list:
         generate_model(reg_l1, reg_l2)
