@@ -5,6 +5,7 @@ import numpy as np
 import h5py
 import time
 import foolbox
+import os
 
 subtract_pixel_mean = True
 
@@ -122,7 +123,9 @@ def generate_adv(model):
 
 # attack_BoundaryAttack = foolbox.attacks.BoundaryAttack(model_adv)
 # attack_wrapper(attack_BoundaryAttack, "Boundary", 10)
-model_name_list = ["cifar10_ResNetSVM20v3_model.121.0.2.L1.0.001", "cifar10_ResNetSVM20v3_model.170.0.1.L1.0.001"]
-for model_name in model_name_list:
-    model = keras.models.load_model(model_name + ".h5")
-    generate_adv(model)
+dir = "benchamark_adv"
+for root, _, files in os.walk(dir):
+    # model_name_list = ["cifar10_ResNetSVM20v3_model.121.0.2.L1.0.001", "cifar10_ResNetSVM20v3_model.170.0.1.L1.0.001"]
+    for model_name in files:
+        model = keras.models.load_model(os.path.join(root, model_name))
+        generate_adv(model)
