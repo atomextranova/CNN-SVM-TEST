@@ -126,10 +126,11 @@ def generate_adv(model, model_name):
 # attack_wrapper(attack_BoundaryAttack, "Boundary", 10)
 
 def attack():
-    if len(sys.argv) != 2:
-        print("arg error, " + sys.argv[0] + " input_dir");
+    if len(sys.argv) != 3:
+        # print("arg error, " + sys.argv[0] + " input_dir");
         exit(1)
     input_dir = sys.argv[1];
+    index = sys.argv[2]
 
     if os.path.isfile(input_dir):
         exit(1);
@@ -146,7 +147,7 @@ def attack():
             for file in files:
                 if os.path.splitext(file)[1] == ".h5":
                     model_files.append(file)
-            model_name = model_files[0]
+            model_name = model_files[index]
             model_dir = os.path.join(root, model_name)
             model = keras.models.load_model(model_dir)
             generate_adv(model, model_name)
