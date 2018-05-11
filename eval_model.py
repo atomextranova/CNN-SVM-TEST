@@ -134,11 +134,17 @@ def attack():
     if os.path.isfile(input_dir):
         exit(1);
     else:
+        # for root, _, files in os.walk(input_dir):
+        #     # model_name_list = ["cifar10_ResNetSVM20v3_model.121.0.2.L1.0.001", "cifar10_ResNetSVM20v3_model.170.0.1.L1.0.001"]
+        #     for model_name in files:
+        #         model_dir = os.path.join(root, model_name)
+        #         model = keras.models.load_model(model_dir)
+        #         generate_adv(model, model_name)
+
         for root, _, files in os.walk(input_dir):
-            # model_name_list = ["cifar10_ResNetSVM20v3_model.121.0.2.L1.0.001", "cifar10_ResNetSVM20v3_model.170.0.1.L1.0.001"]
-            for model_name in files:
-                model_dir = os.path.join(root, model_name)
-                model = keras.models.load_model(model_dir)
-                generate_adv(model, model_name)
+            model_name = files[0]
+            model_dir = os.path.join(root, model_name)
+            model = keras.models.load_model(model_dir)
+            generate_adv(model, model_name)
 
 attack()
