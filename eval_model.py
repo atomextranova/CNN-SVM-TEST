@@ -6,6 +6,7 @@ import h5py
 import time
 import foolbox
 import os
+import sys
 
 subtract_pixel_mean = True
 
@@ -50,7 +51,7 @@ def generate_orig(name, x, pred, y):
         hf.create_dataset('label', data=y)
 
 
-def attack_wrapper(attack, name, gap=1, part=False):
+def attack_wrapper(model_name, attack, name, gap=1, part=False):
     name += "_" + model_name
     adv = []
     # for i in range(x_test.shape[0]):
@@ -85,7 +86,7 @@ def attack_wrapper(attack, name, gap=1, part=False):
         hf.create_dataset('adv_label', data=model.predict(adv))
 
 
-def generate_adv(model):
+def generate_adv(model, model_name):
     # try:
     #     with h5py.File("orig.h5", "r") as hf:
     #
@@ -107,25 +108,37 @@ def generate_adv(model):
 
     attack_Single_Pixel = foolbox.attacks.SinglePixelAttack(model_adv)
 
-    attack_wrapper(attack_deep_fool_l2, "DeepFool_L_2", 10)
-    attack_wrapper(attack_DFL_INF, 'DeepFool_L_INF', 10)
-    attack_wrapper(attack_DFL_0, "DeepFool_L_0", 10)
+    attack_wrapper(model_name, attack_deep_fool_l2, "DeepFool_L_2", 10)
+    attack_wrapper(model_name, attack_DFL_INF, 'DeepFool_L_INF', 10)
+    attack_wrapper(model_name, attack_DFL_0, "DeepFool_L_0", 10)
 
-    attack_wrapper(attack_LBFGSAttack, 'LBGFS', 10)
-    attack_wrapper(attack_IterGrad, "Iter_Grad", 10)
-    attack_wrapper(attack_IterGradSign, "Iter_GradSign", 10)
+    attack_wrapper(model_name, attack_LBFGSAttack, 'LBGFS', 10)
+    attack_wrapper(model_name, attack_IterGrad, "Iter_Grad", 10)
+    attack_wrapper(model_name, attack_IterGradSign, "Iter_GradSign", 10)
 
-    attack_wrapper(attack_Local, "Local_Search", 10)
-    attack_wrapper(attack_Single_Pixel, "Single_Pixel", 10)
+    attack_wrapper(model_name, attack_Local, "Local_Search", 10)
+    attack_wrapper(model_name, attack_Single_Pixel, "Single_Pixel", 10)
 
-    attack_wrapper(attack_GaussianBlur, "Gaussian_Blur", 10)
+    attack_wrapper(model_name, attack_GaussianBlur, "Gaussian_Blur", 10)
 
 
 # attack_BoundaryAttack = foolbox.attacks.BoundaryAttack(model_adv)
 # attack_wrapper(attack_BoundaryAttack, "Boundary", 10)
-dir = "benchamark_adv"
-for root, _, files in os.walk(dir):
-    # model_name_list = ["cifar10_ResNetSVM20v3_model.121.0.2.L1.0.001", "cifar10_ResNetSVM20v3_model.170.0.1.L1.0.001"]
-    for model_name in files:
-        model = keras.models.load_model(os.path.join(root, model_name))
-        generate_adv(model)
+
+def attack():
+    if len(sys.argv) != 2:
+        print("arg error, " + sys.argv[0] + " input_dir");
+        exit(1)
+    input_dir = sys.argv[1];
+
+    if os.path.isfile(input_dir):
+        exit(1);
+    else:
+        for root, _, files in os.walk(input_dir):
+            # model_name_list = ["cifar10_ResNetSVM20v3_model.121.0.2.L1.0.001", "cifar10_ResNetSVM20v3_model.170.0.1.L1.0.001"]
+            for model_name in files:
+                model_dir = os.path.join(root, model_name)
+                model = keras.models.load_model(model_dir)
+                generate_adv(model, model_name)
+
+attack()
