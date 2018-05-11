@@ -51,7 +51,7 @@ def generate_orig(name, x, pred, y):
         hf.create_dataset('label', data=y)
 
 
-def attack_wrapper(model_name, attack, name, gap=1, part=False):
+def attack_wrapper(model, model_name, attack, name, gap=1, part=False):
     name += "_" + model_name
     adv = []
     # for i in range(x_test.shape[0]):
@@ -108,18 +108,18 @@ def generate_adv(model, model_name):
 
     attack_Single_Pixel = foolbox.attacks.SinglePixelAttack(model_adv)
 
-    attack_wrapper(model_name, attack_deep_fool_l2, "DeepFool_L_2", 10)
-    attack_wrapper(model_name, attack_DFL_INF, 'DeepFool_L_INF', 10)
-    attack_wrapper(model_name, attack_DFL_0, "DeepFool_L_0", 10)
+    attack_wrapper(model, model_name, attack_deep_fool_l2, "DeepFool_L_2", 10)
+    attack_wrapper(model, model_name, attack_DFL_INF, 'DeepFool_L_INF', 10)
+    attack_wrapper(model, model_name, attack_DFL_0, "DeepFool_L_0", 10)
 
-    attack_wrapper(model_name, attack_LBFGSAttack, 'LBGFS', 10)
-    attack_wrapper(model_name, attack_IterGrad, "Iter_Grad", 10)
-    attack_wrapper(model_name, attack_IterGradSign, "Iter_GradSign", 10)
+    attack_wrapper(model, model_name, attack_LBFGSAttack, 'LBGFS', 10)
+    attack_wrapper(model, model_name, attack_IterGrad, "Iter_Grad", 10)
+    attack_wrapper(model, model_name, attack_IterGradSign, "Iter_GradSign", 10)
 
-    attack_wrapper(model_name, attack_Local, "Local_Search", 10)
-    attack_wrapper(model_name, attack_Single_Pixel, "Single_Pixel", 10)
+    attack_wrapper(model, model_name, attack_Local, "Local_Search", 10)
+    attack_wrapper(model, model_name, attack_Single_Pixel, "Single_Pixel", 10)
 
-    attack_wrapper(model_name, attack_GaussianBlur, "Gaussian_Blur", 10)
+    attack_wrapper(model, model_name, attack_GaussianBlur, "Gaussian_Blur", 10)
 
 
 # attack_BoundaryAttack = foolbox.attacks.BoundaryAttack(model_adv)
@@ -142,7 +142,11 @@ def attack():
         #         generate_adv(model, model_name)
 
         for root, _, files in os.walk(input_dir):
-            model_name = files[0]
+            model_files = []
+            for file in files:
+                if os.path.splitext(file)[1] == ".h5":
+                    model_files.append(file)
+            model_name = model_files[0]
             model_dir = os.path.join(root, model_name)
             model = keras.models.load_model(model_dir)
             generate_adv(model, model_name)
