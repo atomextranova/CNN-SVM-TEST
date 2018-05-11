@@ -130,7 +130,8 @@ def attack():
         # print("arg error, " + sys.argv[0] + " input_dir");
         exit(1)
     input_dir = sys.argv[1];
-    index = sys.argv[2]
+    index = int(sys.argv[2])
+    print(index)
 
     if os.path.isfile(input_dir):
         exit(1);
