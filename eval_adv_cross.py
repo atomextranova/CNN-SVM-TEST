@@ -74,15 +74,8 @@ def save_to_image(name, img, adv, pred, adv_label, label):
         plt.imsave(str(i) + name + ".png", adv[i], format='png')
 
 
-def generate_orig_selected(x, pred, y):
-    with h5py.File("orig_selected.h5", "w") as hf:
-        hf.create_dataset('orig', data=x)
-        hf.create_dataset('pred', data=pred)
-        hf.create_dataset('label', data=y)
-
-
 def read_orig():
-    with  h5py.File('orig.h5') as hf:
+    with  h5py.File('attack/orig.h5') as hf:
         # value = list(hf.values())
         # print(value)
         return hf['orig'][:], hf['pred'][:], hf['label'][:]
@@ -90,10 +83,10 @@ def read_orig():
 
 def read_adv_img(model, adv):
     if model == "":
-        with h5py.File("adv_" + adv + "_" + "gap.h5", 'r') as hf:
+        with h5py.File("attack/adv_" + adv + "_" + "gap.h5", 'r') as hf:
             return hf['adv'][:]
     else:
-        with h5py.File("adv_" + adv + "_" + model + "_gap.h5", 'r') as hf:
+        with h5py.File("attack/adv_" + adv + "_" + model.split("/")[1] + "_gap.h5", 'r') as hf:
             return hf['adv'][:]
 
 
@@ -112,7 +105,7 @@ if __name__ == '__main__':
     img = image[::10]
 
     label = label[::10]
-    with h5py.File("mean.h5", "r") as hf:
+    with h5py.File("attack/mean.h5", "r") as hf:
         mean = hf['mean'][:]
     model_list = ["cifar10_ResNet20v1_model.194",
                   "cifar10_ResNetSVM20v3_model.028.25.0.0001",
@@ -120,9 +113,28 @@ if __name__ == '__main__':
                   "cifar10_ResNetSVM20v3_model.158.5.0.001",
                   "cifar10_ResNetSVM20v3_model.158.40.0.001",
                   "cifar10_ResNetSVM20v3_model.158.10.0.001",
-                  "cifar10_ResNetSVM20v3_model.195.0.5.0.001"]
+                  "cifar10_ResNetSVM20v3_model.195.0.5.0.001",
+                  "cifar10_ResNetSVM20v3_model.170.0.1.L1.0.001",
+                  "cifar10_ResNetSVM20v3_model.147.0.15.L1.0.001",
+                  "cifar10_ResNetSVM20v3_model.121.0.2.L1.0.001",
+                  "cifar10_ResNetSVM20v3_model.121.0.25.L1.0.001",
+                  "cifar10_ResNetSVM20v3_model.125.0.3.L1.0.001",
+                  "cifar10_ResNetSVM20v3_model.195.0.1.0.5.L1.0.001",
+                  # "cifar10_ResNetSVM20v3_model.147.0.1.5.L1.0.001",
+                  "cifar10_ResNetSVM20v3_model.122.0.1.10.L1.0.001",
+                  "cifar10_ResNetSVM20v3_model.143.0.15.0.5.L1.0.001",
+                  "cifar10_ResNetSVM20v3_model.116.0.15.2.L1.0.001",
+                  "cifar10_ResNetSVM20v3_model.192.0.15.5.L1.0.001",
+                  "cifar10_ResNetSVM20v3_model.182.0.15.10.L1.0.001",]
 
-    worksheet_name = ["CNN", "CNN-SVM-25", "CNN-SVM-35", "CNN-SVM-5", "CNN-SVM-40", "CNN-SVM-10", "CNN-SVM-0.5"]
+    for i, item in enumerate(model_list):
+        model_list[i] = "attack/"+item
+
+    # "CNN-SVM-L1-0.1-L2-2","CNN-SVM-L1-0.1-L2-5"
+    worksheet_name = ["CNN", "CNN-SVM-L2-25", "CNN-SVM-L2-35", "CNN-SVM-L2-5", "CNN-SVM-L2-40", "CNN-SVM-L2-10", "CNN-SVM-L2-0.5",
+                      "CNN-SVM-L1-0.1", "CNN-SVM-L1-0.15", "CNN-SVM-L1-0.2", "CNN-SVM-L1-0.25", "CNN-SVM-L1-0.3",
+                      "CNN-SVM-L1-0.1-L2-0.5", "CNN-SVM-L1-0.1-L2-10",
+                      "CNN-SVM-L1-0.15-L2-0.5", "CNN-SVM-L1-0.15-L2-2", "CNN-SVM-L1-0.15-L2-5", "CNN-SVM-L1-0.15-L2-10"]
 
     adv_list = ['DeepFool_L_0', 'DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
                 'Local_search', 'Single_Pixel', 'DeepFool_L_INF', 'Gaussian_Blur']
@@ -148,7 +160,7 @@ if __name__ == '__main__':
             table.write(0, l+1, adv_name)
         for j, name in enumerate(model_list):
             print("Using image from model: %s\n" % name)
-            if name == "cifar10_ResNet20v1_model.194":
+            if name == "attack/cifar10_ResNet20v1_model.194":
                 name = ""
             efficiency = []
             for adv_method in adv_list:
