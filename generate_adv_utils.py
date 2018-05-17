@@ -27,7 +27,6 @@ if subtract_pixel_mean:
     x_train -= x_train_mean
     x_test -= x_train_mean
 
-gap = 1000
 
 def array_to_scalar(arr):
     list = []
@@ -55,9 +54,8 @@ def generate_orig(name, x, pred, y):
 
 def attack_wrapper(model, model_name, attack, name, gap, lock, part=False):
     # root_dir = os.getcwd()
-    model_base_name = os.path.splitext(model_name)[0]
     # save_base_path = os.path.join(root_dir, "adv_image/{}".format(model_base_name))
-    save_base_path = "adv_image/{}".format(model_base_name)
+    save_base_path = "adv_image/{}".format(model_name)
 
     # Race conditon here: Let pass will not work
     # 1) other error other than
@@ -75,26 +73,26 @@ def attack_wrapper(model, model_name, attack, name, gap, lock, part=False):
     # for i in range(x_test.shape[0]):
     # for i in range(int(x_test.shape[0] / 40)):
     record = open(os.path.join(save_base_path, "{}.txt").format(name), 'w')
-    record.write("--- " + name + " started ---")
+    record.write("--- " + name + " started ---\n")
     start = time.time()
     count = 0
     for i in range(int(x_test.shape[0] / gap)):
         # for i in range(1):
         # for i in range(10):
         if i % 10 == 0:
-            record.write("Generateing %d images with gap %d" % (i, gap))
+            record.write("Generateing %d images with gap %d\n" % (i, gap))
         adv_image = attack(x_test[i * gap], y_test[i * gap])
         # if adv_image == None:
         #     adv_image
         if adv_image is not None:
             adv.append(adv_image)
         else:
-            record.write("Fail to generate adv image. Appending original image.")
+            record.write("Fail to generate adv image. Appending original image.\n")
             adv.append(x_test[i * gap])
             count += 1
     adv = np.array(adv, 'float32')
-    record.write("--- " + name + " %s seconds ---" % (time.time() - start))
-    record.write("Sucessfully generated %d images with gap %d, including %d original images" % (
+    record.write("--- " + name + " %s seconds ---\n" % (time.time() - start))
+    record.write("Sucessfully generated %d images with gap %d, including %d original images\n" % (
         int(adv.shape[0]), gap, count))
     if part:
         name += "_part"
@@ -107,7 +105,11 @@ def attack_wrapper(model, model_name, attack, name, gap, lock, part=False):
     return
 
 
+gap = 10000
+
+
 def attack_group_1(model_adv, model, model_name, lock):
+    # start = time.time()
     attack_deep_fool_l2 = foolbox.attacks.DeepFoolL2Attack(model_adv)
 
     attack_DFL_INF = foolbox.attacks.DeepFoolLinfinityAttack(model_adv)
@@ -121,23 +123,30 @@ def attack_group_1(model_adv, model, model_name, lock):
 
     attack_GaussianBlur = foolbox.attacks.GaussianBlurAttack(model_adv)
     attack_wrapper(model, model_name, attack_GaussianBlur, "Gaussian_Blur", gap, lock)
+    # print("--- " + str(1) + "takes %s seconds ---\n" % (time.time() - start))
 
 
 def attack_group_2(model_adv, model, model_name, lock):
+    # start = time.time()
     attack_IterGradSign = foolbox.attacks.IterativeGradientSignAttack(model_adv)
     attack_wrapper(model, model_name, attack_IterGradSign, "Iter_GradSign", gap, lock)
+    # print("--- " + str(2) + "takes %s seconds ---\n" % (time.time() - start))
 
 
 def attack_group_3(model_adv, model, model_name, lock):
+    # start = time.time()
     attack_IterGrad = foolbox.attacks.IterativeGradientAttack(model_adv)
     attack_wrapper(model, model_name, attack_IterGrad, "Iter_Grad", gap, lock)
+    # print("--- " + str(3) + "takes %s seconds ---\n" % (time.time() - start))
 
 
 def attack_group_4(model_adv, model, model_name, lock):
+    # start = time.time()
     attack_Local = foolbox.attacks.LocalSearchAttack(model_adv)
     attack_Single_Pixel = foolbox.attacks.SinglePixelAttack(model_adv)
     attack_wrapper(model, model_name, attack_Local, "Local_Search", gap, lock)
     attack_wrapper(model, model_name, attack_Single_Pixel, "Single_Pixel", gap, lock)
+    # print("--- " + str(4) + "takes %s seconds ---\n" % (time.time() - start))
 
 
 # def generate_adv(model, model_name):
@@ -180,7 +189,11 @@ def attack_group_4(model_adv, model, model_name, lock):
 # attack_wrapper(attack_BoundaryAttack, "Boundary", gap)
 
 def attack(model_dir, model_name):
+    model_name = os.path.splitext(model_name)[0]
+    start = time.time()
     model = keras.models.load_model(model_dir)
+    # make thread ready manually
+    model._make_predict_function()
     model_adv = foolbox.models.KerasModel(model, bounds=(-1, 1), preprocessing=((0, 0, 0), 1))
 
     thread_list = []
@@ -194,10 +207,23 @@ def attack(model_dir, model_name):
         thread.start()
     for thread in thread_list:
         thread.join()
+    print("--- " + model_name + "takes %s seconds ---\n" % (time.time() - start))
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print('Provide the path to the model')
+        print('Provide the path argument for model or model directory')
     model_dir = sys.argv[1]
-    model_name = model_dir.split('/')[-1]
-    attack(model_dir, model_name)
+    try:
+        if os.path.isfile(model_dir):
+            model_name = model_dir.split('/')[-1]
+            attack(model_dir, model_name)
+        elif os.path.isdir(model_dir):
+            for root, _, files in os.walk(model_dir):
+                for model_name in files:
+                    model_dir = os.path.join(root, model_name)
+                    attack(model_dir, model_name)
+    except:
+        print("Provide either tha path to the model or the directory of the model")
+        exit(1)
+
