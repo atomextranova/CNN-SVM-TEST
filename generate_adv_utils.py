@@ -27,6 +27,7 @@ if subtract_pixel_mean:
     x_train -= x_train_mean
     x_test -= x_train_mean
 
+gap = 1000
 
 def array_to_scalar(arr):
     list = []
@@ -103,6 +104,7 @@ def attack_wrapper(model, model_name, attack, name, gap, lock, part=False):
         hf.create_dataset('adv', data=(adv + x_train_mean))
         hf.create_dataset('adv_label', data=model.predict(adv))
     record.close()
+    return
 
 
 def attack_group_1(model_adv, model, model_name, lock):
@@ -110,32 +112,32 @@ def attack_group_1(model_adv, model, model_name, lock):
 
     attack_DFL_INF = foolbox.attacks.DeepFoolLinfinityAttack(model_adv)
     attack_DFL_0 = foolbox.attacks.DeepFoolAttack(model_adv)
-    attack_wrapper(model, model_name, attack_deep_fool_l2, "DeepFool_L_2", 10, lock)
-    attack_wrapper(model, model_name, attack_DFL_INF, 'DeepFool_L_INF', 10, lock)
-    attack_wrapper(model, model_name, attack_DFL_0, "DeepFool_L_0", 10, lock)
+    attack_wrapper(model, model_name, attack_deep_fool_l2, "DeepFool_L_2", gap, lock)
+    attack_wrapper(model, model_name, attack_DFL_INF, 'DeepFool_L_INF', gap, lock)
+    attack_wrapper(model, model_name, attack_DFL_0, "DeepFool_L_0", gap, lock)
 
     attack_LBFGSAttack = foolbox.attacks.LBFGSAttack(model_adv)
-    attack_wrapper(model, model_name, attack_LBFGSAttack, 'LBGFS', 10, lock)
+    attack_wrapper(model, model_name, attack_LBFGSAttack, 'LBGFS', gap, lock)
 
     attack_GaussianBlur = foolbox.attacks.GaussianBlurAttack(model_adv)
-    attack_wrapper(model, model_name, attack_GaussianBlur, "Gaussian_Blur", 10, lock)
+    attack_wrapper(model, model_name, attack_GaussianBlur, "Gaussian_Blur", gap, lock)
 
 
 def attack_group_2(model_adv, model, model_name, lock):
     attack_IterGradSign = foolbox.attacks.IterativeGradientSignAttack(model_adv)
-    attack_wrapper(model, model_name, attack_IterGradSign, "Iter_GradSign", 10, lock)
+    attack_wrapper(model, model_name, attack_IterGradSign, "Iter_GradSign", gap, lock)
 
 
 def attack_group_3(model_adv, model, model_name, lock):
     attack_IterGrad = foolbox.attacks.IterativeGradientAttack(model_adv)
-    attack_wrapper(model, model_name, attack_IterGrad, "Iter_Grad", 10, lock)
+    attack_wrapper(model, model_name, attack_IterGrad, "Iter_Grad", gap, lock)
 
 
 def attack_group_4(model_adv, model, model_name, lock):
     attack_Local = foolbox.attacks.LocalSearchAttack(model_adv)
     attack_Single_Pixel = foolbox.attacks.SinglePixelAttack(model_adv)
-    attack_wrapper(model, model_name, attack_Local, "Local_Search", 10, lock)
-    attack_wrapper(model, model_name, attack_Single_Pixel, "Single_Pixel", 10, lock)
+    attack_wrapper(model, model_name, attack_Local, "Local_Search", gap, lock)
+    attack_wrapper(model, model_name, attack_Single_Pixel, "Single_Pixel", gap, lock)
 
 
 # def generate_adv(model, model_name):
@@ -160,22 +162,22 @@ def attack_group_4(model_adv, model, model_name, lock):
 #
 #     attack_Single_Pixel = foolbox.attacks.SinglePixelAttack(model_adv)
 #
-#     attack_wrapper(model, model_name, attack_deep_fool_l2, "DeepFool_L_2", 10)
-#     attack_wrapper(model, model_name, attack_DFL_INF, 'DeepFool_L_INF', 10)
-#     attack_wrapper(model, model_name, attack_DFL_0, "DeepFool_L_0", 10)
+#     attack_wrapper(model, model_name, attack_deep_fool_l2, "DeepFool_L_2", gap)
+#     attack_wrapper(model, model_name, attack_DFL_INF, 'DeepFool_L_INF', gap)
+#     attack_wrapper(model, model_name, attack_DFL_0, "DeepFool_L_0", gap)
 #
-#     attack_wrapper(model, model_name, attack_LBFGSAttack, 'LBGFS', 10)
-#     attack_wrapper(model, model_name, attack_IterGrad, "Iter_Grad", 10)
-#     attack_wrapper(model, model_name, attack_IterGradSign, "Iter_GradSign", 10)
+#     attack_wrapper(model, model_name, attack_LBFGSAttack, 'LBGFS', gap)
+#     attack_wrapper(model, model_name, attack_IterGrad, "Iter_Grad", gap)
+#     attack_wrapper(model, model_name, attack_IterGradSign, "Iter_GradSign", gap)
 #
-#     attack_wrapper(model, model_name, attack_Local, "Local_Search", 10)
-#     attack_wrapper(model, model_name, attack_Single_Pixel, "Single_Pixel", 10)
+#     attack_wrapper(model, model_name, attack_Local, "Local_Search", gap)
+#     attack_wrapper(model, model_name, attack_Single_Pixel, "Single_Pixel", gap)
 #
-#     attack_wrapper(model, model_name, attack_GaussianBlur, "Gaussian_Blur", 10)
+#     attack_wrapper(model, model_name, attack_GaussianBlur, "Gaussian_Blur", gap)
 
 
 # attack_BoundaryAttack = foolbox.attacks.BoundaryAttack(model_adv)
-# attack_wrapper(attack_BoundaryAttack, "Boundary", 10)
+# attack_wrapper(attack_BoundaryAttack, "Boundary", gap)
 
 def attack(model_dir, model_name):
     model = keras.models.load_model(model_dir)
@@ -190,6 +192,8 @@ def attack(model_dir, model_name):
 
     for thread in thread_list:
         thread.start()
+    for thread in thread_list:
+        thread.join()
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
