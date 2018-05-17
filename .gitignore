@@ -1,4 +1,9 @@
 *.h5
 *.txt
 *.xlsx
+*.pkl
+*.xls
+
 .idea/
+attack/
+benchmark/
