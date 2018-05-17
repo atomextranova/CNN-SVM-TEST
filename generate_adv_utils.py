@@ -105,7 +105,7 @@ def attack_wrapper(model, model_name, attack, name, gap, lock, part=False):
     return
 
 
-gap = 10000
+gap = 10
 
 
 def attack_group_1(model_adv, model, model_name, lock):
@@ -189,6 +189,7 @@ def attack_group_4(model_adv, model, model_name, lock):
 # attack_wrapper(attack_BoundaryAttack, "Boundary", gap)
 
 def attack(model_dir, model_name):
+    print(model_name, " started")
     model_name = os.path.splitext(model_name)[0]
     start = time.time()
     model = keras.models.load_model(model_dir)
