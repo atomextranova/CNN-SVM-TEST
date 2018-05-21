@@ -1,9 +1,10 @@
 import os
 import h5py
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import keras
 import xlwt
+import sys
 
 
 # def eval_adv(model, name, mean, image, pred, label):
@@ -66,12 +67,12 @@ def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name):
 #
 #     plt.show()
 
-def save_to_image(name, img, adv, pred, adv_label, label):
-    img = np.reshape(img, (img.shape[0], 32, 32, 3))
-    adv = np.reshape(adv, (img.shape[0], 32, 32, 3))
-    for i in range(img.shape[0]):
-        plt.imsave(str(i) + ".png", img[i], format='png')
-        plt.imsave(str(i) + name + ".png", adv[i], format='png')
+# def save_to_image(name, img, adv, pred, adv_label, label):
+#     img = np.reshape(img, (img.shape[0], 32, 32, 3))
+#     adv = np.reshape(adv, (img.shape[0], 32, 32, 3))
+#     for i in range(img.shape[0]):
+#         plt.imsave(str(i) + ".png", img[i], format='png')
+#         plt.imsave(str(i) + name + ".png", adv[i], format='png')
 
 
 def read_orig():
@@ -86,8 +87,14 @@ def read_adv_img(model, adv):
         with h5py.File("attack/adv_" + adv + "_" + "gap.h5", 'r') as hf:
             return hf['adv'][:]
     else:
-        with h5py.File("attack/adv_" + adv + "_" + model.split("/")[1] + "_gap.h5", 'r') as hf:
+        with h5py.File("attack/adv_" + adv + "_" + model.split("\\")[1] + "_gap.h5", 'r') as hf:
             return hf['adv'][:]
+
+def condition(worksheet_name):
+    if len(worksheet_name) >= 30:
+        return worksheet_name[-29:]
+    else:
+        return worksheet_name
 
 
 if __name__ == '__main__':
@@ -107,34 +114,50 @@ if __name__ == '__main__':
     label = label[::10]
     with h5py.File("attack/mean.h5", "r") as hf:
         mean = hf['mean'][:]
-    model_list = ["cifar10_ResNet20v1_model.194",
-                  "cifar10_ResNetSVM20v3_model.028.25.0.0001",
-                  "cifar10_ResNetSVM20v3_model.156.35.0.001",
-                  "cifar10_ResNetSVM20v3_model.158.5.0.001",
-                  "cifar10_ResNetSVM20v3_model.158.40.0.001",
-                  "cifar10_ResNetSVM20v3_model.158.10.0.001",
-                  "cifar10_ResNetSVM20v3_model.195.0.5.0.001",
-                  "cifar10_ResNetSVM20v3_model.170.0.1.L1.0.001",
-                  "cifar10_ResNetSVM20v3_model.147.0.15.L1.0.001",
-                  "cifar10_ResNetSVM20v3_model.121.0.2.L1.0.001",
-                  "cifar10_ResNetSVM20v3_model.121.0.25.L1.0.001",
-                  "cifar10_ResNetSVM20v3_model.125.0.3.L1.0.001",
-                  "cifar10_ResNetSVM20v3_model.195.0.1.0.5.L1.0.001",
-                  # "cifar10_ResNetSVM20v3_model.147.0.1.5.L1.0.001",
-                  "cifar10_ResNetSVM20v3_model.122.0.1.10.L1.0.001",
-                  "cifar10_ResNetSVM20v3_model.143.0.15.0.5.L1.0.001",
-                  "cifar10_ResNetSVM20v3_model.116.0.15.2.L1.0.001",
-                  "cifar10_ResNetSVM20v3_model.192.0.15.5.L1.0.001",
-                  "cifar10_ResNetSVM20v3_model.182.0.15.10.L1.0.001",]
+    # model_list = ["cifar10_ResNet20v1_model.194",
+    #               "cifar10_ResNetSVM20v3_model.028.25.0.0001",
+    #               "cifar10_ResNetSVM20v3_model.156.35.0.001",
+    #               "cifar10_ResNetSVM20v3_model.158.5.0.001",
+    #               "cifar10_ResNetSVM20v3_model.158.40.0.001",
+    #               "cifar10_ResNetSVM20v3_model.158.10.0.001",
+    #               "cifar10_ResNetSVM20v3_model.195.0.5.0.001",
+    #               "cifar10_ResNetSVM20v3_model.170.0.1.L1.0.001",
+    #               "cifar10_ResNetSVM20v3_model.147.0.15.L1.0.001",
+    #               "cifar10_ResNetSVM20v3_model.121.0.2.L1.0.001",
+    #               "cifar10_ResNetSVM20v3_model.121.0.25.L1.0.001",
+    #               "cifar10_ResNetSVM20v3_model.125.0.3.L1.0.001",
+    #               "cifar10_ResNetSVM20v3_model.195.0.1.0.5.L1.0.001",
+    #               # "cifar10_ResNetSVM20v3_model.147.0.1.5.L1.0.001",
+    #               "cifar10_ResNetSVM20v3_model.122.0.1.10.L1.0.001",
+    #               "cifar10_ResNetSVM20v3_model.143.0.15.0.5.L1.0.001",
+    #               "cifar10_ResNetSVM20v3_model.116.0.15.2.L1.0.001",
+    #               "cifar10_ResNetSVM20v3_model.192.0.15.5.L1.0.001",
+    #               "cifar10_ResNetSVM20v3_model.182.0.15.10.L1.0.001",]
 
-    for i, item in enumerate(model_list):
-        model_list[i] = "attack/"+item
+    # for root, _, file in os.walk(sys.argv[1]):
+    #     if (file.startwith("cifar")):
+    #
 
-    # "CNN-SVM-L1-0.1-L2-2","CNN-SVM-L1-0.1-L2-5"
-    worksheet_name = ["CNN", "CNN-SVM-L2-25", "CNN-SVM-L2-35", "CNN-SVM-L2-5", "CNN-SVM-L2-40", "CNN-SVM-L2-10", "CNN-SVM-L2-0.5",
-                      "CNN-SVM-L1-0.1", "CNN-SVM-L1-0.15", "CNN-SVM-L1-0.2", "CNN-SVM-L1-0.25", "CNN-SVM-L1-0.3",
-                      "CNN-SVM-L1-0.1-L2-0.5", "CNN-SVM-L1-0.1-L2-10",
-                      "CNN-SVM-L1-0.15-L2-0.5", "CNN-SVM-L1-0.15-L2-2", "CNN-SVM-L1-0.15-L2-5", "CNN-SVM-L1-0.15-L2-10"]
+    file_dir = sys.argv[1]
+    file_name = [os.path.splitext(file)[0] for file in os.listdir(file_dir) if os.path.isfile(os.path.join(file_dir, file))
+                  and file.startswith('cifar')
+                  and file.endswith('.h5')]
+
+    # xlwt requires less than 31
+    # worksheet_name = [name for name in worksheet_name if len(name) < 30]
+
+
+    model_list = [os.path.join(file_dir, file) for file in file_name]
+    worksheet_name = list(map(condition, file_name))
+
+    # for i, item in enumerate(model_list):
+    #     model_list[i] = "attack/"+item
+
+    # # "CNN-SVM-L1-0.1-L2-2","CNN-SVM-L1-0.1-L2-5"
+    # worksheet_name = ["CNN", "CNN-SVM-L2-25", "CNN-SVM-L2-35", "CNN-SVM-L2-5", "CNN-SVM-L2-40", "CNN-SVM-L2-10", "CNN-SVM-L2-0.5",
+    #                   "CNN-SVM-L1-0.1", "CNN-SVM-L1-0.15", "CNN-SVM-L1-0.2", "CNN-SVM-L1-0.25", "CNN-SVM-L1-0.3",
+    #                   "CNN-SVM-L1-0.1-L2-0.5", "CNN-SVM-L1-0.1-L2-10",
+    #                   "CNN-SVM-L1-0.15-L2-0.5", "CNN-SVM-L1-0.15-L2-2", "CNN-SVM-L1-0.15-L2-5", "CNN-SVM-L1-0.15-L2-10"]
 
     adv_list = ['DeepFool_L_0', 'DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
                 'Local_search', 'Single_Pixel', 'DeepFool_L_INF', 'Gaussian_Blur']
@@ -160,7 +183,8 @@ if __name__ == '__main__':
             table.write(0, l+1, adv_name)
         for j, name in enumerate(model_list):
             print("Using image from model: %s\n" % name)
-            if name == "attack/cifar10_ResNet20v1_model.194":
+            # if name == "attack/cifar10_ResNet20v1_model.194":
+            if 'cifar10_ResNet20v1_model.194' in name:
                 name = ""
             efficiency = []
             for adv_method in adv_list:
