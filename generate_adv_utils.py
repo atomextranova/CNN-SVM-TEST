@@ -217,7 +217,7 @@ if __name__ == "__main__":
     model_dir = sys.argv[1]
     try:
         if os.path.isfile(model_dir):
-            model_name = model_dir.split('/')[-1]
+            model_name = os.path.basename(model_dir)
             attack(model_dir, model_name)
         elif os.path.isdir(model_dir):
             for root, _, files in os.walk(model_dir):
