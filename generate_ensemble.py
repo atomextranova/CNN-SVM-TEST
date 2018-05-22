@@ -1,20 +1,15 @@
 from __future__ import print_function
+
 import os
+import sys
+
 # os.environ["CUDA_VISIBLE_DEVICES"]="1"
 import keras
-from keras.layers import Dense, Conv2D, BatchNormalization, Activation
-from keras.layers import AveragePooling2D, Input, Flatten
-from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint, LearningRateScheduler
-from keras.callbacks import ReduceLROnPlateau
-from keras.preprocessing.image import ImageDataGenerator
-from keras.regularizers import l2
-from keras import backend as K
-from keras.models import Model
-from keras.datasets import cifar10
 import numpy as np
-import glob
-import sys
+from keras.datasets import cifar10
+from keras.layers import Input
+from keras.models import Model
+
 
 def resnet_ensemble(input_layer):
     model_path = sys.argv[1]
@@ -22,16 +17,19 @@ def resnet_ensemble(input_layer):
     for root, _, files in os.walk(model_path):
         for file in files:
             temp_model = keras.models.load_model(os.path.join(root, file))
+            temp_model.name = file
             temp_model.layers.pop(0)
-            for layer in temp_model.layers:
-                layer.name = file + layer.name
+            # for layer in temp_model.layers:
+            #     layer.name = file + layer.name
             new_output = temp_model(input_layer)
-            new_model = new_output
-            model_list.append(new_model)
+            # new_output.name = file + new_output.name
+            # new_model = new_output
+            model_list.append(new_output)
     final_output = keras.layers.average(model_list)
     ensemble_model = Model(inputs=input_layer, outputs=final_output, name='ensemble')
     print(ensemble_model.summary())
     return ensemble_model, 'Ensemble_ResNet%dv%d' % (depth, version)
+
 
 depth = 20
 version = 3
@@ -67,6 +65,7 @@ y_test = keras.utils.to_categorical(y_test, num_classes)
 new_input = Input(input_shape)
 model, model_type = resnet_ensemble(new_input)
 model.compile(loss='categorical_crossentropy',
+              optimizer='rmsprop',
               metrics=['accuracy'])
 
 scores = model.evaluate(x_test, y_test, verbose=1)
