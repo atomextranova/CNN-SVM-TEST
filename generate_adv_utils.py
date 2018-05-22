@@ -206,8 +206,8 @@ def attack(model_dir, model_name):
 
     for thread in thread_list:
         thread.start()
-    # for thread in thread_list:
-    #     thread.join()
+    for thread in thread_list:
+        thread.join()
     print("--- " + model_name + "takes %s seconds ---\n" % (time.time() - start))
 
 
