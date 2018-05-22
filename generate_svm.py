@@ -24,9 +24,6 @@ num_classes = 10
 
 subtract_pixel_mean = True
 
-# Model name, depth and version
-model_type = 'ResNetSVM%dv%d' % (depth, version)
-
 # Load the CIFAR10 data.
 (x_train, y_train), (x_test, y_test) = cifar10.load_data()
 
@@ -74,30 +71,40 @@ def lr_schedule(epoch):
     print('Learning rate: ', lr)
     return lr
 
-def resnet_svm_v1(reg_l1, reg_l2, num_classes=10):
+def resnet_svm(reg_l1, reg_l2, num_classes=10):
     base_model = keras.models.load_model("cifar10_ResNet20v1_model.194.h5")
     base_model.layers.pop()
     x = base_model.layers[-1].output
-    x = Dense(num_classes, activation='linear', name='predictions', kernel_regularizer=keras.regularizers.l1_l2(reg_l1, reg_l2))(x)
+    x = Dense(num_classes, activation='linear', name='SVM_L1_{!s}_L2_{!s}'.format(reg_l1, reg_l2), kernel_regularizer=keras.regularizers.l1_l2(reg_l1, reg_l2))(x)
     model1 = Model(input=base_model.input, output=x)
-    return model1
+    return model1, 'ResNetSVM%dv%d' % (depth, version)
 
+def resnet(reg_l1, reg_l2, num_classes=10):
+    base_model = keras.models.load_model("cifar10_ResNet20v1_model.194.h5")
+    base_model.layers.pop()
+    x = base_model.layers[-1].output
+    x = Dense(num_classes, activation='softmax', name='Softmax_L1_{!s}_L2_{!s}'.format(reg_l1, reg_l2), kernel_regularizer=keras.regularizers.l1_l2(reg_l1, reg_l2))(x)
+    model1 = Model(input=base_model.input, output=x)
+    return model1, 'ResNet%dv%d' % (depth, version)
 
-def generate_model(l1, l2):
-    model = resnet_svm_v1(reg_l1=l1, reg_l2=l2)
+def generate_model(l1, l2, type=None):
+    if type == 'svm':
+        model, model_type = resnet_svm(reg_l1=l1, reg_l2=l2)
+        model.compile(loss='categorical_hinge',
+                      optimizer=Adam(lr=lr_schedule(0)),
+                      metrics=['accuracy'])
+    else:
+        model, model_type = resnet(reg_l1=l1, reg_l2=l2)
+        model.compile(loss='categorical_crossentropy',
+                      optimizer=Adam(lr=lr_schedule(0)),
+                      metrics=['accuracy'])
 
-    # model.compile(loss='categorical_crossentropy',
-    #               optimizer=Adam(lr=lr_schedule(0)),
-    #               metrics=['accuracy'])
-    model.compile(loss='categorical_hinge',
-                  optimizer=Adam(lr=lr_schedule(0)),
-                  metrics=['accuracy'])
     model.summary()
     print(model_type)
 
     # Prepare model model saving directory.
-    save_dir = os.path.join(os.getcwd(), 'saved_models_svm')
-    model_name = 'cifar10_%s_model.{epoch:03d}.' % (model_type) + str(l1) + "." + str(l2) +'.L1.0.001.h5'
+    save_dir = os.path.join(os.getcwd(), 'saved_models_new')
+    model_name = 'cifar10_%s_model.{epoch:03d}.L1_%s.L2_%s.h5' % (model_type, str(l1), str(l2))
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
     filepath = os.path.join(save_dir, model_name)
@@ -167,14 +174,28 @@ def generate_model(l1, l2):
 
     # Score trained model.
     scores = model.evaluate(x_test, y_test, verbose=1)
+
     print('Test loss:', scores[0])
     print('Test accuracy:', scores[1])
 
+    file.write(model_name + "\n")
+    file.write('Test loss:' + str(scores[0]) + "\n")
+    file.write('Test accuracy:' + str(scores[1]) + "\n")
 
+file = open("result", "w")
 # regulization
 # = [0.25, 0.3, 0.35, 0.4, 0.15]
-l1_list = [0.25]
-l2_list = [10, 15]
+l1_list = [0.2, 0.25]
+l2_list = [0]
 for reg_l1 in l1_list:
     for reg_l2 in l2_list:
-        generate_model(reg_l1, reg_l2)
+        generate_model(reg_l1, reg_l2, 'svm')
+
+
+# l1_list = [0]
+# l2_list = [0.5, 25]
+# for reg_l1 in l1_list:
+#     for reg_l2 in l2_list:
+#         generate_model(reg_l1, reg_l2, 'svm')
+
+file.close()
