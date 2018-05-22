@@ -3,7 +3,10 @@
 *.xlsx
 *.pkl
 *.xls
+*.rar
+*.zip
 
 .idea/
 attack/
 benchmark/
+logs/

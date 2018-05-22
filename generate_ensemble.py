@@ -67,8 +67,16 @@ model, model_type = resnet_ensemble(new_input)
 model.compile(loss='categorical_crossentropy',
               optimizer='rmsprop',
               metrics=['accuracy'])
-
 scores = model.evaluate(x_test, y_test, verbose=1)
 
+file = open('result-%s.txt' % model_type, 'w')
 print('Test loss:', scores[0])
 print('Test accuracy:', scores[1])
+
+file.write('Test loss:' + str(scores[0]))
+file.write('Test accuracy:' + str(scores[1]))
+
+file.close()
+
+
+model.save_weights(model_type + '.hdh5')
