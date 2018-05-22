@@ -29,7 +29,7 @@ def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name):
         adv_name, total, valid, attack, attack / valid))
     print("Max value change: %10.8f, Min value change %10.8f, Avg value per pixel per channel: %10.8f\n" % (
         max_val, min_val, avg_val))
-    return attack / valid
+    return attack / valid, attack / 1000
 
 
 # def read_labeled_data(x_test, pred, y_test):
@@ -189,12 +189,13 @@ if __name__ == '__main__':
             efficiency = []
             for adv_method in adv_list:
                 adv_img = read_adv_img(name, adv_method)
-                efficiency.append(eval_adv(model, img, adv_img, pred, label, name, adv_method))
+                among_adv, among_all = eval_adv(model, img, adv_img, pred, label, name, adv_method)
+                efficiency.append('{:.4%}/{:.4%}'.format(among_adv, among_all))
             table.write(j+1, 0, name)
             for k, rate in enumerate(efficiency):
                 table.write(j+1, k+1, rate)
 
-    file.save("report-final.xlsx")
+    file.save("report-final-5-22-2.xls")
     # example('DeepFool_L_0', image, pred, label)
     # example('DeepFool_L_2', image, pred, label)
     # example('LBGFS', image, pred, label)
