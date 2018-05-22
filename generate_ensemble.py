@@ -23,6 +23,8 @@ def resnet_ensemble(input_layer):
         for file in files:
             temp_model = keras.models.load_model(os.path.join(root, file))
             temp_model.layers.pop(0)
+            for layer in temp_model.layers:
+                layer.name = file + layer.name
             new_output = temp_model(input_layer)
             new_model = new_output
             model_list.append(new_model)
