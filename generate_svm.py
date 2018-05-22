@@ -14,6 +14,8 @@ from keras import backend as K
 from keras.models import Model
 from keras.datasets import cifar10
 import numpy as np
+import glob
+import sys
 
 data_augmentation = True
 batch_size = 32
@@ -87,10 +89,29 @@ def resnet(reg_l1, reg_l2, num_classes=10):
     model1 = Model(input=base_model.input, output=x)
     return model1, 'ResNet%dv%d' % (depth, version)
 
+def resnet_ensemble(input_layer):
+    model_path = sys.argv[1]
+    model_list = []
+    for root, _, file in os.walk(model_path):
+        temp_model = keras.models.load_model(os.path.join(root, file))
+        temp_model.pop(0)
+        new_output = temp_model(input_layer)
+        new_model = new_output
+        model_list.append(new_model)
+    final_output = keras.layers.average(model_list)
+    ensemble_model = Model(inputs=input_layer, outputs=final_output, name='ensemble')
+    return ensemble_model, 'Ensemble_ResNet%dv%d' % (depth, version)
+
 def generate_model(l1, l2, type=None):
     if type == 'svm':
         model, model_type = resnet_svm(reg_l1=l1, reg_l2=l2)
         model.compile(loss='categorical_hinge',
+                      optimizer=Adam(lr=lr_schedule(0)),
+                      metrics=['accuracy'])
+    elif type == 'ensemble':
+        new_input = Input(input_shape)
+        model, model_type = resnet_ensemble(new_input)
+        model.compile(loss='categorical_crossentropy',
                       optimizer=Adam(lr=lr_schedule(0)),
                       metrics=['accuracy'])
     else:
