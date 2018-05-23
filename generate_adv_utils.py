@@ -23,9 +23,9 @@ x_test = x_test.astype('float32') / 255
 
 # If subtract pixel mean is enabled
 x_train_mean = np.mean(x_train, axis=0)
-if subtract_pixel_mean:
-    x_train -= x_train_mean
-    x_test -= x_train_mean
+# if subtract_pixel_mean:
+#     x_train -= x_train_mean
+#     x_test -= x_train_mean
 
 
 def array_to_scalar(arr):
@@ -195,7 +195,7 @@ def attack(model_dir, model_name):
     model = keras.models.load_model(model_dir)
     # make thread ready manually
     model._make_predict_function()
-    model_adv = foolbox.models.KerasModel(model, bounds=(-1, 1), preprocessing=((0, 0, 0), 1))
+    model_adv = foolbox.models.KerasModel(model, bounds=(-1, 1), preprocessing=(x_train_mean, 1))
 
     thread_list = []
     my_args_dict = dict(model_adv=model_adv, model=model, model_name=model_name, lock=threading.Lock())
