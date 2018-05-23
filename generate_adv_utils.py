@@ -55,7 +55,7 @@ def generate_orig(name, x, pred, y):
 def attack_wrapper(model, model_name, attack, name, gap, lock, part=False):
     # root_dir = os.getcwd()
     # save_base_path = os.path.join(root_dir, "adv_image/{}".format(model_base_name))
-    save_base_path = "adv_image/{}".format(model_name)
+    save_base_path = "adv_image_new/{}".format(model_name)
 
     # Race conditon here: Let pass will not work
     # 1) other error other than
