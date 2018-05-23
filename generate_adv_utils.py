@@ -113,17 +113,17 @@ def attack_group_1(model_adv, model, model_name, lock):
     attack_deep_fool_l2 = foolbox.attacks.DeepFoolL2Attack(model_adv)
 
     attack_DFL_INF = foolbox.attacks.DeepFoolLinfinityAttack(model_adv)
-    attack_DFL_0 = foolbox.attacks.DeepFoolAttack(model_adv)
+
     attack_wrapper(model, model_name, attack_deep_fool_l2, "DeepFool_L_2", gap, lock)
     attack_wrapper(model, model_name, attack_DFL_INF, 'DeepFool_L_INF', gap, lock)
-    attack_wrapper(model, model_name, attack_DFL_0, "DeepFool_L_0", gap, lock)
 
-    attack_LBFGSAttack = foolbox.attacks.LBFGSAttack(model_adv)
-    attack_wrapper(model, model_name, attack_LBFGSAttack, 'LBGFS', gap, lock)
 
-    attack_GaussianBlur = foolbox.attacks.GaussianBlurAttack(model_adv)
-    attack_wrapper(model, model_name, attack_GaussianBlur, "Gaussian_Blur", gap, lock)
-    # print("--- " + str(1) + "takes %s seconds ---\n" % (time.time() - start))
+    # attack_LBFGSAttack = foolbox.attacks.LBFGSAttack(model_adv)
+    # attack_wrapper(model, model_name, attack_LBFGSAttack, 'LBGFS', gap, lock)
+    #
+    # attack_GaussianBlur = foolbox.attacks.GaussianBlurAttack(model_adv)
+    # attack_wrapper(model, model_name, attack_GaussianBlur, "Gaussian_Blur", gap, lock)
+    # # print("--- " + str(1) + "takes %s seconds ---\n" % (time.time() - start))
 
 
 def attack_group_2(model_adv, model, model_name, lock):
@@ -195,14 +195,14 @@ def attack(model_dir, model_name):
     model = keras.models.load_model(model_dir)
     # make thread ready manually
     model._make_predict_function()
-    model_adv = foolbox.models.KerasModel(model, bounds=(-1, 1), preprocessing=(x_train_mean, 1))
+    model_adv = foolbox.models.KerasModel(model, bounds=(0, 1), preprocessing=(x_train_mean, 1))
 
     thread_list = []
     my_args_dict = dict(model_adv=model_adv, model=model, model_name=model_name, lock=threading.Lock())
     thread_list.append(threading.Thread(target=attack_group_1, kwargs=my_args_dict))
-    thread_list.append(threading.Thread(target=attack_group_2, kwargs=my_args_dict))
-    thread_list.append(threading.Thread(target=attack_group_3, kwargs=my_args_dict))
-    thread_list.append(threading.Thread(target=attack_group_4, kwargs=my_args_dict))
+    # thread_list.append(threading.Thread(target=attack_group_2, kwargs=my_args_dict))
+    # thread_list.append(threading.Thread(target=attack_group_3, kwargs=my_args_dict))
+    # thread_list.append(threading.Thread(target=attack_group_4, kwargs=my_args_dict))
 
     for thread in thread_list:
         thread.start()
