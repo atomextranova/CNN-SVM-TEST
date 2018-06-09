@@ -6,21 +6,55 @@ import keras
 import xlwt
 import sys
 
+# Load the CIFAR10 data.
+(x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
+
+# Input image dimensions.
+input_shape = x_train.shape[1:]
+
+# Normalize data.
+x_train = x_train.astype('float32') / 255
+x_test = x_test.astype('float32') / 255
+
+# If subtract pixel mean is enabled
+x_train_mean = np.mean(x_train, axis=0)
+
+x_train -= x_train_mean
+x_test -= x_train_mean
+
+
+
+def array_to_scalar(arr):
+    list = []
+    for item in arr:
+        list.append(np.asscalar(item))
+    return np.array(list)
+
+
+# Convert class vectors to binary class matrices.
+y_train = array_to_scalar(y_train)
+y_test = array_to_scalar(y_test)
+
+print('x_train shape:', x_train.shape)
+print(x_train.shape[0], 'train samples')
+print(x_test.shape[0], 'test samples')
+print('y_train shape:', y_train.shape)
+
 
 # def eval_adv(model, name, mean, image, pred, label):
 def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name):
     valid = 0
     attack = 0
-    adv_label = model.predict(adv_img - mean)
+    adv_label = model.predict(adv_img-mean)
     total = 0
     for i in range(adv_label.shape[0]):
         total += 1
-        if np.argmax(pred_orig[i]) == label[i]:
+        if np.argmax(pred_orig[i]) == label[i*10]:
             valid += 1
-            if np.argmax(pred_orig[i]) != np.argmax(adv_label[i]):
+            if label[i*10] != np.argmax(adv_label[i]):
                 attack += 1
-    min_val = np.amin(adv_img - image) * 255
-    max_val = np.amax(adv_img - image) * 255
+    min_val = np.amin(np.abs(adv_img - image)) * 255
+    max_val = np.amax(np.abs(adv_img - image)) * 255
     avg_val = np.sum(np.abs(adv_img - image)) / adv_img.shape[0] / adv_img.shape[1] / adv_img.shape[2] / adv_img.shape[
         3] * 255
     if valid == 0:
@@ -29,7 +63,7 @@ def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name):
         adv_name, total, valid, attack, attack / valid))
     print("Max value change: %10.8f, Min value change %10.8f, Avg value per pixel per channel: %10.8f\n" % (
         max_val, min_val, avg_val))
-    return attack / valid, attack / 1000
+    return attack, valid
 
 
 # def read_labeled_data(x_test, pred, y_test):
@@ -84,10 +118,10 @@ def read_orig():
 
 def read_adv_img(model, adv):
     if model == "":
-        with h5py.File("attack/adv_" + adv + "_" + "gap.h5", 'r') as hf:
+        with h5py.File("clip_attack/adv_" + adv + "_" + "gap.h5", 'r') as hf:
             return hf['adv'][:]
     else:
-        with h5py.File("attack/adv_" + adv + "_" + model.split("\\")[1] + "_gap.h5", 'r') as hf:
+        with h5py.File("clip_attack/adv_" + adv + "_" + model.split("\\")[1] + "_gap.h5", 'r') as hf:
             return hf['adv'][:]
 
 def condition(worksheet_name):
@@ -98,6 +132,7 @@ def condition(worksheet_name):
 
 
 if __name__ == '__main__':
+    txt_record = open("evaluation_results.txt", 'w')
     # x_test, pred, y_test = read_orig()
     # x_test, pred, y_test = read_labeled_data(x_test, pred, y_test)
     # generate_orig_selected(x_test, pred, y_test)
@@ -111,7 +146,7 @@ if __name__ == '__main__':
 
     img = image[::10]
 
-    label = label[::10]
+    # label = label[::10]
     with h5py.File("attack/mean.h5", "r") as hf:
         mean = hf['mean'][:]
     # model_list = ["cifar10_ResNet20v1_model.194",
@@ -159,18 +194,24 @@ if __name__ == '__main__':
     #                   "CNN-SVM-L1-0.1-L2-0.5", "CNN-SVM-L1-0.1-L2-10",
     #                   "CNN-SVM-L1-0.15-L2-0.5", "CNN-SVM-L1-0.15-L2-2", "CNN-SVM-L1-0.15-L2-5", "CNN-SVM-L1-0.15-L2-10"]
 
-    adv_list = ['DeepFool_L_0', 'DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
+    adv_list = ['DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
                 'Local_search', 'Single_Pixel', 'DeepFool_L_INF', 'Gaussian_Blur']
+
+    # adv_list = ['DeepFool_L_2',
+    #         'DeepFool_L_INF', 'Gaussian_Blur']
 
     # for model_name in model_list:
     #     for adv_dataset in adv_list:
     file = xlwt.Workbook(encoding = "utf-8")
+    # file_real_number = xlwt.Workbook(encoding = "utf-8")
     accuracy = file.add_sheet("Accuracy base line")
     accuracy.write(0, 1, "Loss")
     accuracy.write(0, 2, "Accuracy")
+    adv_result_dict = {key: [] for key in adv_list}
+    adv_result_cross_dict = {key: [] for key in adv_list}
     for i, model_name in enumerate(model_list):
         model = keras.models.load_model(model_name + ".h5")
-        pred = model.predict(img - mean)
+        pred = model.predict(x_test[::10])
         print("--- Evaluation: %s, started ---\n" % (model_name))
         loss, acc = model.evaluate(image-mean, label_ex, verbose=0)
         print('Test loss:', loss)
@@ -190,12 +231,34 @@ if __name__ == '__main__':
             for adv_method in adv_list:
                 adv_img = read_adv_img(name, adv_method)
                 among_adv, among_all = eval_adv(model, img, adv_img, pred, label, name, adv_method)
-                efficiency.append('{:.4%}/{:.4%}'.format(among_adv, among_all))
+                efficiency.append(among_adv/among_all)
+                if model_name == name:
+                    adv_result_dict[adv_method].append(among_adv/among_all)
+                else:
+                    adv_result_cross_dict[adv_method].append(among_adv/among_all)
             table.write(j+1, 0, name)
             for k, rate in enumerate(efficiency):
                 table.write(j+1, k+1, rate)
 
-    file.save("report-final-5-22-2.xls")
+
+    txt_record.write("Cross results\n")
+    for key, rate in adv_result_cross_dict.items():
+        attack_rate = np.array(rate)
+        avg = np.average(attack_rate)
+        std = np.std(attack_rate)
+        report = "{}: average accuracy: {} with variance: {}\n".format(key, avg, std)
+        print(report)
+        txt_record.write(report)
+
+    txt_record.write("Target results\n")
+    for key, rate in adv_result_dict.items():
+        attack_rate = np.array(rate)
+        avg = np.average(attack_rate)
+        std = np.std(attack_rate)
+        report = "{}: average accuracy: {} with variance: {}\n".format(key, avg, std)
+        print(report)
+        txt_record.write(report)
+    file.save("report-final-5-28-4.xls")
     # example('DeepFool_L_0', image, pred, label)
     # example('DeepFool_L_2', image, pred, label)
     # example('LBGFS', image, pred, label)

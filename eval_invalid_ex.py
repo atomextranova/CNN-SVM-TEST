@@ -84,10 +84,11 @@ def read_orig():
 
 def read_adv_img(model, adv):
     if model == "":
-        with h5py.File("attack/adv_" + adv + "_" + "gap.h5", 'r') as hf:
+        with h5py.File("clip_attack/adv_" + adv + "_" + "gap.h5", 'r') as hf:
             return hf['adv'][:]
     else:
-        with h5py.File("attack/adv_" + adv + "_" + model.split("/")[1] + "_gap.h5", 'r') as hf:
+        # with h5py.File("adv_gem_2/adv_" + adv + "_" + model.split("\\")[1] + "_gap.h5", 'r') as hf:
+        with h5py.File("clip_attack/adv_" + adv + "_" + model.split("\\")[1] + "_gap.h5", 'r') as hf:
             return hf['adv'][:]
 
 def condition(worksheet_name):
@@ -98,6 +99,8 @@ def condition(worksheet_name):
 
 
 if __name__ == '__main__':
+
+    record = open("new_record_image.txt", 'w')
     # x_test, pred, y_test = read_orig()
     # x_test, pred, y_test = read_labeled_data(x_test, pred, y_test)
     # generate_orig_selected(x_test, pred, y_test)
@@ -159,8 +162,10 @@ if __name__ == '__main__':
     #                   "CNN-SVM-L1-0.1-L2-0.5", "CNN-SVM-L1-0.1-L2-10",
     #                   "CNN-SVM-L1-0.15-L2-0.5", "CNN-SVM-L1-0.15-L2-2", "CNN-SVM-L1-0.15-L2-5", "CNN-SVM-L1-0.15-L2-10"]
 
-    adv_list = ['DeepFool_L_0', 'DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
+    adv_list = ['DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
                 'Local_search', 'Single_Pixel', 'DeepFool_L_INF', 'Gaussian_Blur']
+    # adv_list = ['DeepFool_L_2',
+    #         'DeepFool_L_INF', 'Gaussian_Blur']
 
     # for model_name in model_list:
     #     for adv_dataset in adv_list:
@@ -168,39 +173,60 @@ if __name__ == '__main__':
     # accuracy = file.add_sheet("Accuracy base line")
     # accuracy.write(0, 1, "Loss")
     # accuracy.write(0, 2, "Accuracy")
-    for i, model_name in enumerate(model_list):
+    # for i, model_name in enumerate(model_list):
         # model = keras.models.load_model(model_name + ".h5")
         # pred = model.predict(img - mean)
-        print("--- Evaluation: %s, started ---\n" % (model_name))
-        # loss, acc = model.evaluate(image-mean, label_ex, verbose=0)
-        # print('Test loss:', loss)
-        # print('Test accuracy:', acc)
-        # accuracy.write(i + 1, 0, model_name)
-        # accuracy.write(i + 1, 1, loss)
-        # accuracy.write(i + 1, 2, acc)
-        table = file.add_sheet(worksheet_name[i])
-        for l, adv_name in enumerate(adv_list):
-            table.write(0, l+1, adv_name)
-        for j, name in enumerate(model_list):
-            print("Using image from model: %s\n" % name)
-            # if name == "attack/cifar10_ResNet20v1_model.194":
-            if 'cifar10_ResNet20v1_model.194' in name:
-                name = ""
-            efficiency = []
+    # print("--- Evaluation: %s, started ---\n" % (model_name))
+    # loss, acc = model.evaluate(image-mean, label_ex, verbose=0)
+    # print('Test loss:', loss)
+    # print('Test accuracy:', acc)
+    # accuracy.write(i + 1, 0, model_name)
+    # accuracy.write(i + 1, 1, loss)
+    # accuracy.write(i + 1, 2, acc)
+    table = file.add_sheet(worksheet_name[0])
+    for l, adv_name in enumerate(adv_list):
+        table.write(0, l+1, adv_name)
 
-            for adv_method in adv_list:
-                adv_img = read_adv_img(name, adv_method)
+    def write(record, key, value_list):
+        for adv_method in value_list:
+            record.write('{}.{}: Avg: {}. Std: {}\n'.format(adv_method, key, np.average(value_list[adv_method][key]), np.var(value_list[adv_method][key])))
+    value_list = {key: {'avg': [], 'max': [], 'min': []} for key in adv_list}
+    for j, name in enumerate(model_list):
+        print("Using image from model: %s\n" % name)
+        # if name == "attack/cifar10_ResNet20v1_model.194":
+        if 'cifar10_ResNet20v1_model.194' in name:
+            name = ""
+        efficiency = []
+
+        for adv_method in adv_list:
+            adv_img = read_adv_img(name, adv_method)
+            min_val = np.amin(np.abs(adv_img - img)) * 255
+            max_val = np.amax(np.abs(adv_img - img)) * 255
+            avg_val = np.sum(np.abs(adv_img - img)) / adv_img.shape[0] / adv_img.shape[1] / adv_img.shape[2] / adv_img.shape[3] * 255
+            value_list[adv_method]['avg'].append(avg_val)
+            value_list[adv_method]['min'].append(min_val)
+            value_list[adv_method]['max'].append(max_val)
+
+            for i in range(adv_img.shape[0]):
                 count = 0
-                for i in adv_img.shape[0]:
-                    temp_img = np.abs(adv_img[0])
-                    if len(np.where(temp_img>1)) != 0:
-                        count +=1
-                efficiency.append(count)
-            table.write(j+1, 0, name)
-            for k, rate in enumerate(efficiency):
-                table.write(j+1, k+1, rate)
+                temp_img = adv_img[i]
+                temp_index = np.where((temp_img > 1) | (temp_img < 0))
+                for array in temp_index:
+                    if len(array) != 0:
+                        count+=1
+                        break
+            efficiency.append(count)
 
-    file.save("report-final-5-22-2.xls")
+        table.write(j+1, 0, name)
+        for k, rate in enumerate(efficiency):
+            table.write(j+1, k+1, rate)
+
+
+
+    write(record, 'avg', value_list)
+    write(record, 'min', value_list)
+    write(record, 'max', value_list)
+    file.save("invalid.xls")
     # example('DeepFool_L_0', image, pred, label)
     # example('DeepFool_L_2', image, pred, label)
     # example('LBGFS', image, pred, label)
