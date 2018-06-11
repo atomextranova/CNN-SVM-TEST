@@ -16,16 +16,20 @@ def resnet_ensemble(input_layer):
     model_list = []
     for root, _, files in os.walk(model_path):
         for file in files:
-            temp_model = keras.models.load_model(os.path.join(root, file))
-            temp_model.name = file
-            temp_model.layers.pop(0)
-            # for layer in temp_model.layers:
-            #     layer.name = file + layer.name
-            new_output = temp_model(input_layer)
-            # new_output.name = file + new_output.name
-            # new_model = new_output
-            model_list.append(new_output)
-    final_output = keras.layers.average(model_list)
+            if file.endswith('h5'):
+                temp_model = keras.models.load_model(os.path.join(root, file))
+                temp_model.name = file
+                temp_model.layers.pop(0)
+                # for layer in temp_model.layers:
+                #     layer.name = file + layer.name
+
+                new_output = temp_model(input_layer)
+                # new_output.name = file + new_output.name
+                # new_model = new_output
+                new_model = Model(inputs=input_layer, outputs=new_output, name=file)
+                model_list.append(new_model)
+    output_tensors = [model.output for model in model_list]
+    final_output = keras.layers.average(output_tensors)
     ensemble_model = Model(inputs=input_layer, outputs=final_output, name='ensemble')
     print(ensemble_model.summary())
     return ensemble_model, 'Ensemble_ResNet%dv%d' % (depth, version)
@@ -67,16 +71,18 @@ model, model_type = resnet_ensemble(new_input)
 model.compile(loss='categorical_crossentropy',
               optimizer='rmsprop',
               metrics=['accuracy'])
-scores = model.evaluate(x_test, y_test, verbose=1)
+# scores = model.evaluate(x_test, y_test, verbose=1)
 
-file = open('result-%s.txt' % model_type, 'w')
-print('Test loss:', scores[0])
-print('Test accuracy:', scores[1])
+# file = open('result-%s.txt' % model_type, 'w')
+# print('Test loss:', scores[0])
+# print('Test accuracy:', scores[1])
+#
+# file.write('Test loss:' + str(scores[0]))
+# file.write('Test accuracy:' + str(scores[1]))
+#
+# file.close()
 
-file.write('Test loss:' + str(scores[0]))
-file.write('Test accuracy:' + str(scores[1]))
+print([lay.name for lay in model.input_layers])
 
-file.close()
-
-
-model.save_weights(model_type + '.hdh5')
+#
+# model.save_weights(model_type + '.hdh5')
