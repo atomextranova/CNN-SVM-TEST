@@ -11,7 +11,8 @@ from keras.layers import Input
 from keras.models import Model
 
 
-def resnet_ensemble(input_layer):
+def resnet_ensemble():
+    input_layer = Input(input_shape)
     model_path = sys.argv[1]
     model_list = []
     for root, _, files in os.walk(model_path):
@@ -19,7 +20,6 @@ def resnet_ensemble(input_layer):
             if file.endswith('h5'):
                 temp_model = keras.models.load_model(os.path.join(root, file))
                 temp_model.name = file
-                temp_model.layers.pop(0)
                 # for layer in temp_model.layers:
                 #     layer.name = file + layer.name
 
@@ -66,23 +66,23 @@ print('y_train shape:', y_train.shape)
 y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 
-new_input = Input(input_shape)
-model, model_type = resnet_ensemble(new_input)
+
+model, model_type = resnet_ensemble()
 model.compile(loss='categorical_crossentropy',
               optimizer='rmsprop',
               metrics=['accuracy'])
-# scores = model.evaluate(x_test, y_test, verbose=1)
+scores = model.evaluate(x_test, y_test, verbose=1)
 
-# file = open('result-%s.txt' % model_type, 'w')
-# print('Test loss:', scores[0])
-# print('Test accuracy:', scores[1])
-#
-# file.write('Test loss:' + str(scores[0]))
-# file.write('Test accuracy:' + str(scores[1]))
-#
-# file.close()
+file = open('result-%s.txt' % model_type, 'w')
+print('Test loss:', scores[0])
+print('Test accuracy:', scores[1])
 
-print([lay.name for lay in model.input_layers])
+file.write('Test loss:' + str(scores[0]))
+file.write('Test accuracy:' + str(scores[1]))
+
+file.close()
+
+model.save('ensemble.h5')
 
 #
 # model.save_weights(model_type + '.hdh5')

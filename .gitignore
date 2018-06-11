@@ -5,6 +5,7 @@
 *.xls
 *.rar
 *.zip
+.DS_Store
 
 .idea/
 attack/
