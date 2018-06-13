@@ -9,6 +9,31 @@ import h5py
 from keras.optimizers import Adam
 
 
+def KerasModelWrapper(_model):
+
+    def __init__(self, _model, softmax=False):
+        if softmax:
+            self.model = clip_model(_model)
+        else:
+            self.model = _model
+        self.make_gradient_function()
+
+    def make_gradient_function(self):
+        input = self.model.input
+        backend_support = ['tensorflow']
+        if K.backend() in backend_support:
+            if K.backend() == 'tensorflow':
+                logit_value = model.outputs
+
+        else:
+            raise NotImplementedError
+
+    def gradient_wrt_output(self, input_image, label):
+        pass
+
+    def gradient_wrt_loss:
+        pass
+
 def deep_fool(model, input_images, label, size_index, p_norm, num_classes = 10, subsample=0, max_iteration=1000):
     if input_images.shape[size_index] != label.shape[size_index]:
         raise ValueError("The amount of images is not equal to that of labels")

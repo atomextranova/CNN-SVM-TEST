@@ -43,27 +43,21 @@ print('y_train shape:', y_train.shape)
 
 # def eval_adv(model, name, mean, image, pred, label):
 def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name):
-    valid = 0
     attack = 0
     adv_label = model.predict(adv_img-mean)
-    total = 0
+    total = 1000
     for i in range(adv_label.shape[0]):
-        total += 1
-        if np.argmax(pred_orig[i]) == label[i*10]:
-            valid += 1
-            if label[i*10] != np.argmax(adv_label[i]):
-                attack += 1
+        if label[i*10] != np.argmax(adv_label[i]):
+            attack += 1
     min_val = np.amin(np.abs(adv_img - image)) * 255
     max_val = np.amax(np.abs(adv_img - image)) * 255
     avg_val = np.sum(np.abs(adv_img - image)) / adv_img.shape[0] / adv_img.shape[1] / adv_img.shape[2] / adv_img.shape[
         3] * 255
-    if valid == 0:
-        valid = 1
-    print("Total for %s attack: %d, Valid Sample: %d, Success: %d, rate: %6.4f" % (
-        adv_name, total, valid, attack, attack / valid))
+    print("Total for %s attack: %d, Success: %d, rate: %6.4f" % (
+        adv_name, total, attack, attack / total))
     print("Max value change: %10.8f, Min value change %10.8f, Avg value per pixel per channel: %10.8f\n" % (
         max_val, min_val, avg_val))
-    return attack, valid
+    return attack, total
 
 
 # def read_labeled_data(x_test, pred, y_test):
@@ -118,10 +112,10 @@ def read_orig():
 
 def read_adv_img(model, adv):
     if model == "":
-        with h5py.File("clip_attack/adv_" + adv + "_" + "gap.h5", 'r') as hf:
+        with h5py.File(file_dir+"/adv_" + adv + "_" + "gap.h5", 'r') as hf:
             return hf['adv'][:]
     else:
-        with h5py.File("clip_attack/adv_" + adv + "_" + model.split("\\")[1] + "_gap.h5", 'r') as hf:
+        with h5py.File(file_dir+"/adv_" + adv + "_" + model.split("\\")[1] + "_gap.h5", 'r') as hf:
             return hf['adv'][:]
 
 def condition(worksheet_name):
@@ -183,6 +177,7 @@ if __name__ == '__main__':
 
 
     model_list = [os.path.join(file_dir, file) for file in file_name]
+    model_list_adv = ['clip_ensemble\\ensemble']
     worksheet_name = list(map(condition, file_name))
 
     # for i, item in enumerate(model_list):
@@ -194,11 +189,14 @@ if __name__ == '__main__':
     #                   "CNN-SVM-L1-0.1-L2-0.5", "CNN-SVM-L1-0.1-L2-10",
     #                   "CNN-SVM-L1-0.15-L2-0.5", "CNN-SVM-L1-0.15-L2-2", "CNN-SVM-L1-0.15-L2-5", "CNN-SVM-L1-0.15-L2-10"]
 
-    adv_list = ['DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
-                'Local_search', 'Single_Pixel', 'DeepFool_L_INF', 'Gaussian_Blur']
+    # adv_list = ['DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
+    #             'Local_search', 'Single_Pixel', 'DeepFool_L_INF', 'Gaussian_Blur']
 
     # adv_list = ['DeepFool_L_2',
     #         'DeepFool_L_INF', 'Gaussian_Blur']
+
+    adv_list = ['DeepFool_L_2',
+            'DeepFool_L_INF']
 
     # for model_name in model_list:
     #     for adv_dataset in adv_list:
@@ -222,7 +220,7 @@ if __name__ == '__main__':
         table = file.add_sheet(worksheet_name[i])
         for l, adv_name in enumerate(adv_list):
             table.write(0, l+1, adv_name)
-        for j, name in enumerate(model_list):
+        for j, name in enumerate(model_list_adv):
             print("Using image from model: %s\n" % name)
             # if name == "attack/cifar10_ResNet20v1_model.194":
             if 'cifar10_ResNet20v1_model.194' in name:
@@ -258,7 +256,7 @@ if __name__ == '__main__':
         report = "{}: average accuracy: {} with variance: {}\n".format(key, avg, std)
         print(report)
         txt_record.write(report)
-    file.save("report-final-5-28-4.xls")
+    file.save("report-final-6-10-4.xls")
     # example('DeepFool_L_0', image, pred, label)
     # example('DeepFool_L_2', image, pred, label)
     # example('LBGFS', image, pred, label)

@@ -23,9 +23,9 @@ x_test = x_test.astype('float32') / 255
 
 # If subtract pixel mean is enabled
 x_train_mean = np.mean(x_train, axis=0)
-# if subtract_pixel_mean:
-#     x_train -= x_train_mean
-#     x_test -= x_train_mean
+if subtract_pixel_mean:
+    x_train -= x_train_mean
+    x_test -= x_train_mean
 
 
 def array_to_scalar(arr):
@@ -121,8 +121,8 @@ def attack_group_1(model_adv, model, model_name, lock):
     # attack_LBFGSAttack = foolbox.attacks.LBFGSAttack(model_adv)
     # attack_wrapper(model, model_name, attack_LBFGSAttack, 'LBGFS', gap, lock)
     #
-    # attack_GaussianBlur = foolbox.attacks.GaussianBlurAttack(model_adv)
-    # attack_wrapper(model, model_name, attack_GaussianBlur, "Gaussian_Blur", gap, lock)
+    attack_GaussianBlur = foolbox.attacks.GaussianBlurAttack(model_adv)
+    attack_wrapper(model, model_name, attack_GaussianBlur, "Gaussian_Blur", gap, lock)
     # # print("--- " + str(1) + "takes %s seconds ---\n" % (time.time() - start))
 
 
@@ -195,7 +195,7 @@ def attack(model_dir, model_name):
     model = keras.models.load_model(model_dir)
     # make thread ready manually
     model._make_predict_function()
-    model_adv = foolbox.models.KerasModel(model, bounds=(0, 1), preprocessing=(x_train_mean, 1))
+    model_adv = foolbox.models.KerasModel(model, bounds=(-1, 1), preprocessing=((0,0,0), 1))
 
     thread_list = []
     my_args_dict = dict(model_adv=model_adv, model=model, model_name=model_name, lock=threading.Lock())
@@ -215,16 +215,14 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         print('Provide the path argument for model or model directory')
     model_dir = sys.argv[1]
-    try:
-        if os.path.isfile(model_dir):
-            model_name = os.path.basename(model_dir)
-            attack(model_dir, model_name)
-        elif os.path.isdir(model_dir):
-            for root, _, files in os.walk(model_dir):
-                for model_name in files:
-                    model_dir = os.path.join(root, model_name)
-                    attack(model_dir, model_name)
-    except:
-        print("Provide either tha path to the model or the directory of the model")
-        exit(1)
+
+    if os.path.isfile(model_dir):
+        model_name = os.path.basename(model_dir)
+        attack(model_dir, model_name)
+    elif os.path.isdir(model_dir):
+        for root, _, files in os.walk(model_dir):
+            for model_name in files:
+                model_dir = os.path.join(root, model_name)
+                attack(model_dir, model_name)
+
 
