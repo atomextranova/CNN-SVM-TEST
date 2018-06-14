@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="96a1f8d9-4129-47a8-8da3-fcb343c833b5" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eval_adv_cross.py" beforeDir="false" afterPath="$PROJECT_DIR$/eval_adv_cross.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generate_adv_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/generate_adv_utils.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,9 +17,9 @@
     <SUITE FILE_PATH="coverage/CNN_SVM$eval_invalid_ex.coverage" NAME="eval_invalid_ex Coverage Results" MODIFIED="1528512026791" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CNN_SVM$demo.coverage" NAME="demo Coverage Results" MODIFIED="1525137620091" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CNN_SVM$generate_ensemble.coverage" NAME="generate_ensemble Coverage Results" MODIFIED="1528735436663" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CNN_SVM$eval_adv_cross.coverage" NAME="eval_adv_cross Coverage Results" MODIFIED="1528930856150" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CNN_SVM$clip_image.coverage" NAME="clip_image Coverage Results" MODIFIED="1528739908518" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CNN_SVM$generate_adv_utils.coverage" NAME="generate_adv_utils Coverage Results" MODIFIED="1528935773399" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CNN_SVM$eval_adv_cross.coverage" NAME="eval_adv_cross Coverage Results" MODIFIED="1528989018865" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CNN_SVM$generate_adv_utils.coverage" NAME="generate_adv_utils Coverage Results" MODIFIED="1528945162267" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CNN_SVM$clip_image.coverage" NAME="clip_image Coverage Results" MODIFIED="1528988970387" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CNN_SVM$eval_model.coverage" NAME="eval_model Coverage Results" MODIFIED="1525137577561" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FileEditorManager">
@@ -26,8 +27,8 @@
       <file leaf-file-name="eval_adv_cross.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/eval_adv_cross.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4123">
-              <caret line="223" column="56" selection-start-line="223" selection-start-column="56" selection-end-line="223" selection-end-column="56" />
+            <state relative-caret-position="434">
+              <caret line="194" selection-start-line="194" selection-end-line="195" selection-end-column="46" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -38,7 +39,7 @@
       <file leaf-file-name="generate_ensemble.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/generate_ensemble.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="950">
+            <state relative-caret-position="529">
               <caret line="60" column="40" selection-start-line="60" selection-start-column="40" selection-end-line="60" selection-end-column="40" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
@@ -50,8 +51,20 @@
       <file leaf-file-name="generate_adv_utils.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/generate_adv_utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="301">
-              <caret line="221" column="34" selection-start-line="221" selection-start-column="34" selection-end-line="221" selection-end-column="34" />
+            <state relative-caret-position="129">
+              <caret line="139" column="54" selection-start-line="139" selection-start-column="54" selection-end-line="139" selection-end-column="54" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="clip_image.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/clip_image.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="209">
+              <caret line="11" column="122" selection-start-line="11" selection-start-column="122" selection-end-line="11" selection-end-column="122" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -154,6 +167,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -165,7 +179,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -193,7 +206,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.generate_adv_utils">
+  <component name="RunManager" selected="Python.eval_adv_cross">
     <configuration name="clip_image" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="CNN_SVM" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -208,7 +221,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/clip_image.py" />
-      <option name="PARAMETERS" value="ensemble_adv clip_ensemble" />
+      <option name="PARAMETERS" value="ensemble_adv/ensemble clip_ensemble" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -349,6 +362,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1096" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5010941" side_tool="true" weight="0.45675105" />
@@ -357,7 +371,7 @@
       <window_info anchor="bottom" id="Python Console" order="11" weight="0.32810867" />
       <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4989059" visible="true" weight="0.3552769" />
       <window_info anchor="bottom" id="Terminal" order="13" weight="0.3260188" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.10501066" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.10714286" />
       <window_info anchor="bottom" id="Docker" order="12" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="4" />
       <window_info anchor="right" id="SciView" order="3" weight="0.6684902" />
@@ -821,30 +835,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/clip_image.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="21" selection-start-line="21" selection-end-line="21" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/foolbox/models/keras.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="397">
           <caret line="53" selection-start-line="53" selection-end-line="53" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/generate_ensemble.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="950">
-          <caret line="60" column="40" selection-start-line="60" selection-start-column="40" selection-end-line="60" selection-end-column="40" />
-          <folding>
-            <element signature="e#0#37#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -855,20 +849,40 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/clip_image.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="11" column="122" selection-start-line="11" selection-start-column="122" selection-end-line="11" selection-end-column="122" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/eval_adv_cross.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4123">
-          <caret line="223" column="56" selection-start-line="223" selection-start-column="56" selection-end-line="223" selection-end-column="56" />
+        <state relative-caret-position="434">
+          <caret line="194" selection-start-line="194" selection-end-line="195" selection-end-column="46" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/generate_ensemble.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="529">
+          <caret line="60" column="40" selection-start-line="60" selection-start-column="40" selection-end-line="60" selection-end-column="40" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/generate_adv_utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="301">
-          <caret line="221" column="34" selection-start-line="221" selection-start-column="34" selection-end-line="221" selection-end-column="34" />
+        <state relative-caret-position="129">
+          <caret line="139" column="54" selection-start-line="139" selection-start-column="54" selection-end-line="139" selection-end-column="54" />
         </state>
       </provider>
     </entry>

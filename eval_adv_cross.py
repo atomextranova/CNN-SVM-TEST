@@ -192,11 +192,11 @@ if __name__ == '__main__':
     # adv_list = ['DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
     #             'Local_search', 'Single_Pixel', 'DeepFool_L_INF', 'Gaussian_Blur']
 
-    # adv_list = ['DeepFool_L_2',
-    #         'DeepFool_L_INF', 'Gaussian_Blur']
-
     adv_list = ['DeepFool_L_2',
-            'DeepFool_L_INF']
+            'DeepFool_L_INF', 'Gaussian_Blur']
+
+    # adv_list = ['DeepFool_L_2',
+    #         'DeepFool_L_INF']
 
     # for model_name in model_list:
     #     for adv_dataset in adv_list:

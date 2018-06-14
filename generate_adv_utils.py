@@ -140,13 +140,13 @@ def attack_group_3(model_adv, model, model_name, lock):
     # print("--- " + str(3) + "takes %s seconds ---\n" % (time.time() - start))
 
 
-def attack_group_4(model_adv, model, model_name, lock):
-    # start = time.time()
-    attack_Local = foolbox.attacks.LocalSearchAttack(model_adv)
-    attack_Single_Pixel = foolbox.attacks.SinglePixelAttack(model_adv)
-    attack_wrapper(model, model_name, attack_Local, "Local_Search", gap, lock)
-    attack_wrapper(model, model_name, attack_Single_Pixel, "Single_Pixel", gap, lock)
-    # print("--- " + str(4) + "takes %s seconds ---\n" % (time.time() - start))
+# def attack_group_4(model_adv, model, model_name, lock):
+#     # start = time.time()
+#     attack_Local = foolbox.attacks.LocalSearchAttack(model_adv)
+#     attack_Single_Pixel = foolbox.attacks.SinglePixelAttack(model_adv)
+#     attack_wrapper(model, model_name, attack_Local, "Local_Search", gap, lock)
+#     attack_wrapper(model, model_name, attack_Single_Pixel, "Single_Pixel", gap, lock)
+#     # print("--- " + str(4) + "takes %s seconds ---\n" % (time.time() - start))
 
 
 # def generate_adv(model, model_name):
