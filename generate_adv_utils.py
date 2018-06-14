@@ -98,6 +98,12 @@ def attack_wrapper(save_dir, model_name, attack, name, gap, lock, part=False):
         name += "_gap"
     with h5py.File(os.path.join(save_base_path, "adv_{}.h5".format(name)), "w") as hf:
         clipped_adv = clip_image(adv + mean_of_image)  # add mean for standard graph, limit data range to be [0, 1]
+        min_val = np.amin(np.abs(clipped_adv - orig_image)) * 255
+        max_val = np.amax(np.abs(clipped_adv - orig_image)) * 255
+        avg_val = np.sum(np.abs(clipped_adv - orig_image)) / clipped_adv.size * 255
+        record.write("Min: {}".format(min_val))
+        record.write("Max: {}".format(max_val))
+        record.write("Avg: {}".format(avg_val))
         hf.create_dataset('adv', data=clipped_adv)
     record.close()
     return
