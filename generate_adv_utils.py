@@ -222,7 +222,8 @@ if __name__ == "__main__":
     elif os.path.isdir(model_dir):
         for root, _, files in os.walk(model_dir):
             for model_name in files:
-                model_dir = os.path.join(root, model_name)
-                attack(model_dir, model_name)
+                if model_name.startswith('ens') or model_name.startswith('cifar'):
+                    model_dir = os.path.join(root, model_name)
+                    attack(model_dir, model_name)
 
 
