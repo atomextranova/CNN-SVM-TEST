@@ -72,14 +72,14 @@ def attack_wrapper(save_dir, model_name, attack, name, gap, lock, part=False):
     name += ("_" + model_name)
     adv = []
     record = open(os.path.join(save_base_path, "{}.txt".format(name)), 'w')
-    record.write("--- {} started ---\n".format(name))
+    print("--- {} started ---\n".format(name))
     start = time.time()
-    for i in range(int(orig_image.shape[0] / gap)):
+    for i, img, label in enumerate(zip(orig_image, orig_label)):
         # for i in range(1):
         # for i in range(10):
         if i % 10 == 0:
             print("Generateing %d images with gap %d\n" % (i, gap))
-        adv_image = attack(orig_image[i * gap], orig_label[i * gap])
+        adv_image = attack(img, label)
         if adv_image is not None:
             adv.append(adv_image)
         # else:
@@ -87,7 +87,9 @@ def attack_wrapper(save_dir, model_name, attack, name, gap, lock, part=False):
         #     adv.append(orig_image[i * gap])
         #     count += 1
     adv = np.array(adv, 'float32')
-    record.write("--- {} {} seconds ---\n".format(name, (time.time() - start)))
+    completion_msg = "--- {} {} seconds ---\n".format(name, (time.time() - start))
+    print(completion_msg)
+    record.write(completion_msg)
     # record.write("Sucessfully generated %d images with gap %d, including %d original images\n" % (
     #     int(adv.shape[0]), gap, count))
     if part:
@@ -95,7 +97,7 @@ def attack_wrapper(save_dir, model_name, attack, name, gap, lock, part=False):
     elif gap != 1:
         name += "_gap"
     with h5py.File(os.path.join(save_base_path, "adv_{}.h5".format(name)), "w") as hf:
-        clipped_adv = clip_image(adv + mean_of_image)  # add mean for standard graph, limit data range to be [0, 255]
+        clipped_adv = clip_image(adv + mean_of_image)  # add mean for standard graph, limit data range to be [0, 1]
         hf.create_dataset('adv', data=clipped_adv)
     record.close()
     return
