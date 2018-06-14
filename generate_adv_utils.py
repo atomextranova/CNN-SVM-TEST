@@ -1,61 +1,62 @@
-import keras
-from keras.models import Model
-from keras.datasets import cifar10
-import numpy as np
-import h5py
-import time
-import foolbox
+import argparse
+import multiprocessing
 import os
-import sys
 import threading
+import time
 
-subtract_pixel_mean = True
-
-# Load the CIFAR10 data.
-(x_train, y_train), (x_test, y_test) = cifar10.load_data()
-
-# Input image dimensions.
-input_shape = x_train.shape[1:]
-
-# Normalize data.
-x_train = x_train.astype('float32') / 255
-x_test = x_test.astype('float32') / 255
-
-# If subtract pixel mean is enabled
-x_train_mean = np.mean(x_train, axis=0)
-if subtract_pixel_mean:
-    x_train -= x_train_mean
-    x_test -= x_train_mean
+import foolbox
+import h5py
+import keras
+import numpy as np
+from keras.datasets import cifar10
 
 
-def array_to_scalar(arr):
-    list = []
-    for item in arr:
-        list.append(np.asscalar(item))
-    return np.array(list)
+def generate_orig():
+    if not os.path.exists('orig.h5'):
+        subtract_pixel_mean = True
+
+        # Load the CIFAR10 data.
+        (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+
+        # Normalize data.
+        x_train = x_train.astype('float32') / 255
+        x_test = x_test.astype('float32') / 255
+
+        # If subtract pixel mean is enabled
+        x_train_mean = np.mean(x_train, axis=0)
+        if subtract_pixel_mean:
+            x_train -= x_train_mean
+            x_test -= x_train_mean
+
+        def array_to_scalar(arr):
+            list = []
+            for item in arr:
+                list.append(np.asscalar(item))
+            return np.array(list)
+
+        # Convert class vectors to binary class matrices.
+        y_train = array_to_scalar(y_train)
+        y_test = array_to_scalar(y_test)
+
+        # Save data
+        with h5py.File("orig.h5", "w") as hf:
+            hf.create_dataset(name='image', data=y_train)
+            hf.create_dataset(name='label', data=y_test)
+            hf.create_dataset(name='mean', data=x_train_mean)
 
 
-# Convert class vectors to binary class matrices.
-y_train = array_to_scalar(y_train)
-y_test = array_to_scalar(y_test)
 
-print('x_train shape:', x_train.shape)
-print(x_train.shape[0], 'train samples')
-print(x_test.shape[0], 'test samples')
-print('y_train shape:', y_train.shape)
+def read_orig(gap):
+    with h5py.File("orig.h5", "r") as hf:
+        return hf['image'][::gap], hf['label'][::gap], hf['mean']
 
-
-def generate_orig(name, x, pred, y):
-    with h5py.File("orig" + name + ".h5", "w") as hf:
-        hf.create_dataset('orig', data=x)
-        hf.create_dataset('pred', data=pred)
-        hf.create_dataset('label', data=y)
+def clip_image(image):
+    return np.clip(image, 0, 1)
 
 
-def attack_wrapper(model, model_name, attack, name, gap, lock, part=False):
-    # root_dir = os.getcwd()
-    # save_base_path = os.path.join(root_dir, "adv_image/{}".format(model_base_name))
-    save_base_path = "{}/{}".format(sys.argv[1], model_name)
+def attack_wrapper(save_dir, model_name, attack, name, gap, lock, part=False):
+    orig_image, orig_label, mean_of_image = read_orig(gap)
+    save_base_path = os.path.join(save_dir, model_name)
 
     # Race conditon here: Let pass will not work
     # 1) other error other than
@@ -68,75 +69,65 @@ def attack_wrapper(model, model_name, attack, name, gap, lock, part=False):
     if not os.path.exists(save_base_path):
         os.makedirs(save_base_path)
     lock.release()
-    name += "_" + model_name
+    name += ("_" + model_name)
     adv = []
-    # for i in range(x_test.shape[0]):
-    # for i in range(int(x_test.shape[0] / 40)):
-    record = open(os.path.join(save_base_path, "{}.txt").format(name), 'w')
-    record.write("--- " + name + " started ---\n")
+    record = open(os.path.join(save_base_path, "{}.txt".format(name)), 'w')
+    record.write("--- {} started ---\n".format(name))
     start = time.time()
-    count = 0
-    for i in range(int(x_test.shape[0] / gap)):
+    for i in range(int(orig_image.shape[0] / gap)):
         # for i in range(1):
         # for i in range(10):
         if i % 10 == 0:
-            record.write("Generateing %d images with gap %d\n" % (i, gap))
-        adv_image = attack(x_test[i * gap], y_test[i * gap])
-        # if adv_image == None:
-        #     adv_image
+            print("Generateing %d images with gap %d\n" % (i, gap))
+        adv_image = attack(orig_image[i * gap], orig_label[i * gap])
         if adv_image is not None:
             adv.append(adv_image)
-        else:
-            record.write("Fail to generate adv image. Appending original image.\n")
-            adv.append(x_test[i * gap])
-            count += 1
+        # else:
+        #     print("Fail to generate adv image. Appending original image.\n")
+        #     adv.append(orig_image[i * gap])
+        #     count += 1
     adv = np.array(adv, 'float32')
-    record.write("--- " + name + " %s seconds ---\n" % (time.time() - start))
-    record.write("Sucessfully generated %d images with gap %d, including %d original images\n" % (
-        int(adv.shape[0]), gap, count))
+    record.write("--- {} {} seconds ---\n".format(name, (time.time() - start)))
+    # record.write("Sucessfully generated %d images with gap %d, including %d original images\n" % (
+    #     int(adv.shape[0]), gap, count))
     if part:
         name += "_part"
     elif gap != 1:
         name += "_gap"
-    with h5py.File(os.path.join(save_base_path, "adv_" + name + ".h5"), "w") as hf:
-        hf.create_dataset('adv', data=(adv + x_train_mean))
-        hf.create_dataset('adv_label', data=model.predict(adv))
+    with h5py.File(os.path.join(save_base_path, "adv_{}.h5".format(name)), "w") as hf:
+        clipped_adv = clip_image(adv + mean_of_image)  # add mean for standard graph, limit data range to be [0, 255]
+        hf.create_dataset('adv', data=clipped_adv)
     record.close()
     return
 
-
-gap = 10
-
-
-def attack_group_1(model_adv, model, model_name, lock):
+def attack_group_1(model_adv, model_name, save_dir, lock, gap):
     # start = time.time()
     attack_deep_fool_l2 = foolbox.attacks.DeepFoolL2Attack(model_adv)
 
     attack_DFL_INF = foolbox.attacks.DeepFoolLinfinityAttack(model_adv)
 
-    attack_wrapper(model, model_name, attack_deep_fool_l2, "DeepFool_L_2", gap, lock)
-    attack_wrapper(model, model_name, attack_DFL_INF, 'DeepFool_L_INF', gap, lock)
+    attack_wrapper(save_dir, model_name, attack_deep_fool_l2, "DeepFool_L_2", gap, lock)
+    attack_wrapper(model_name, attack_DFL_INF, 'DeepFool_L_INF', gap, lock)
 
+    attack_LBFGSAttack = foolbox.attacks.LBFGSAttack(model_adv)
+    attack_wrapper(save_dir, model_name, attack_LBFGSAttack, 'LBGFS', gap, lock)
 
-    # attack_LBFGSAttack = foolbox.attacks.LBFGSAttack(model_adv)
-    # attack_wrapper(model, model_name, attack_LBFGSAttack, 'LBGFS', gap, lock)
-    #
     attack_GaussianBlur = foolbox.attacks.GaussianBlurAttack(model_adv)
-    attack_wrapper(model, model_name, attack_GaussianBlur, "Gaussian_Blur", gap, lock)
+    attack_wrapper(save_dir, model_name, attack_GaussianBlur, "Gaussian_Blur", gap, lock)
     # # print("--- " + str(1) + "takes %s seconds ---\n" % (time.time() - start))
 
 
-def attack_group_2(model_adv, model, model_name, lock):
+def attack_group_2(model_adv, model_name, save_dir, lock, gap):
     # start = time.time()
     attack_IterGradSign = foolbox.attacks.IterativeGradientSignAttack(model_adv)
-    attack_wrapper(model, model_name, attack_IterGradSign, "Iter_GradSign", gap, lock)
+    attack_wrapper(save_dir, model_name, attack_IterGradSign, "Iter_GradSign", gap, lock)
     # print("--- " + str(2) + "takes %s seconds ---\n" % (time.time() - start))
 
 
-def attack_group_3(model_adv, model, model_name, lock):
+def attack_group_3(model_adv, model_name, save_dir, lock, gap):
     # start = time.time()
     attack_IterGrad = foolbox.attacks.IterativeGradientAttack(model_adv)
-    attack_wrapper(model, model_name, attack_IterGrad, "Iter_Grad", gap, lock)
+    attack_wrapper(save_dir, model_name, attack_IterGrad, "Iter_Grad", gap, lock)
     # print("--- " + str(3) + "takes %s seconds ---\n" % (time.time() - start))
 
 
@@ -148,61 +139,20 @@ def attack_group_3(model_adv, model, model_name, lock):
 #     attack_wrapper(model, model_name, attack_Single_Pixel, "Single_Pixel", gap, lock)
 #     # print("--- " + str(4) + "takes %s seconds ---\n" % (time.time() - start))
 
-
-# def generate_adv(model, model_name):
-#     # try:
-#     #     with h5py.File("orig.h5", "r") as hf:
-#     #
-#     # generate_orig("_" , x_test + x_train_mean, pred, y_test)
-#     model_adv = foolbox.models.KerasModel(model, bounds=(-1, 1), preprocessing=((0, 0, 0), 1))
-#
-#     attack_deep_fool_l2 = foolbox.attacks.DeepFoolL2Attack(model_adv)
-#
-#     attack_DFL_INF = foolbox.attacks.DeepFoolLinfinityAttack(model_adv)
-#     attack_DFL_0 = foolbox.attacks.DeepFoolAttack(model_adv)
-#     attack_IterGradSign = foolbox.attacks.IterativeGradientSignAttack(model_adv)
-#
-#     attack_IterGrad = foolbox.attacks.IterativeGradientAttack(model_adv)
-#     attack_LBFGSAttack = foolbox.attacks.LBFGSAttack(model_adv)
-#
-#     attack_Local = foolbox.attacks.LocalSearchAttack(model_adv)
-#
-#     attack_GaussianBlur = foolbox.attacks.GaussianBlurAttack(model_adv)
-#
-#     attack_Single_Pixel = foolbox.attacks.SinglePixelAttack(model_adv)
-#
-#     attack_wrapper(model, model_name, attack_deep_fool_l2, "DeepFool_L_2", gap)
-#     attack_wrapper(model, model_name, attack_DFL_INF, 'DeepFool_L_INF', gap)
-#     attack_wrapper(model, model_name, attack_DFL_0, "DeepFool_L_0", gap)
-#
-#     attack_wrapper(model, model_name, attack_LBFGSAttack, 'LBGFS', gap)
-#     attack_wrapper(model, model_name, attack_IterGrad, "Iter_Grad", gap)
-#     attack_wrapper(model, model_name, attack_IterGradSign, "Iter_GradSign", gap)
-#
-#     attack_wrapper(model, model_name, attack_Local, "Local_Search", gap)
-#     attack_wrapper(model, model_name, attack_Single_Pixel, "Single_Pixel", gap)
-#
-#     attack_wrapper(model, model_name, attack_GaussianBlur, "Gaussian_Blur", gap)
-
-
-# attack_BoundaryAttack = foolbox.attacks.BoundaryAttack(model_adv)
-# attack_wrapper(attack_BoundaryAttack, "Boundary", gap)
-
-def attack(model_dir, model_name):
-    print(model_name, " started")
-    model_name = os.path.splitext(model_name)[0]
+def attack_worker(save_dir, model_name, model_dir, gap):
+    print("{}: attack started".format(model_name))
     start = time.time()
     model = keras.models.load_model(model_dir)
+    print('Successfully loaded model: {}'.format(model_name))
     # make thread ready manually
     model._make_predict_function()
-    model_adv = foolbox.models.KerasModel(model, bounds=(-1, 1), preprocessing=((0,0,0), 1))
+    model_adv = foolbox.models.KerasModel(model, bounds=(-2, 2), preprocessing=((0, 0, 0), 1))
 
     thread_list = []
-    my_args_dict = dict(model_adv=model_adv, model=model, model_name=model_name, lock=threading.Lock())
+    my_args_dict = dict(model_adv=model_adv, save_dir=save_dir, model_name=model_name, lock=threading.Lock(), gap=gap)
     thread_list.append(threading.Thread(target=attack_group_1, kwargs=my_args_dict))
-    # thread_list.append(threading.Thread(target=attack_group_2, kwargs=my_args_dict))
-    # thread_list.append(threading.Thread(target=attack_group_3, kwargs=my_args_dict))
-    # thread_list.append(threading.Thread(target=attack_group_4, kwargs=my_args_dict))
+    thread_list.append(threading.Thread(target=attack_group_2, kwargs=my_args_dict))
+    thread_list.append(threading.Thread(target=attack_group_3, kwargs=my_args_dict))
 
     for thread in thread_list:
         thread.start()
@@ -211,19 +161,53 @@ def attack(model_dir, model_name):
     print("--- " + model_name + "takes %s seconds ---\n" % (time.time() - start))
 
 
+def attack(save_dir, process_size, model_names, model_dirs, gap):
+    generate_orig()
+    attacker_pool = multiprocessing.Pool(processes=process_size)
+    for model_name, model_dir in zip(model_names, model_dirs):
+        attacker_pool.map(attack_worker, (save_dir, model_name, model_dir, gap))
+
+
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print('Provide the path argument for model or model directory')
-    model_dir = sys.argv[1]
+    # if len(sys.argv) != 2:
+    #     print('Provide the path argument for model or model directory')
+    # model_dir = sys.argv[1]
 
-    if os.path.isfile(model_dir):
-        model_name = os.path.basename(model_dir)
-        attack(model_dir, model_name)
-    elif os.path.isdir(model_dir):
-        for root, _, files in os.walk(model_dir):
-            for model_name in files:
-                if model_name.startswith('ens') or model_name.startswith('cifar'):
-                    model_dir = os.path.join(root, model_name)
-                    attack(model_dir, model_name)
+    parser = argparse.ArgumentParser("")
+    parser.add_argument('-m', '--model', nargs='*',
+                        help="specify all models or model directories that is to be attacked")
+    parser.add_argument('-s', '--save_dir', help="specify the save directory for attack file", default=None)
+    parser.add_argument('-p', '--process_size', help='number of processes', type=int, default=4)
+    parser.add_argument('-g', '--gap', help='select images with gap ([::10])', type=int, default=1)
+    # parser.add_argument('-v', '--verbose', help="whether print the progress or not", action='store_true')
+    args = parser.parse_args()
 
+    model_locs = args.model
+    save_dir = None
+    if args.save_dir is None:
+        if isinstance(model_locs, list):
+            save_dir = model_locs[0]
+        else:
+            save_dir = model_locs
+    else:
+        save_dir = args.save_dir
+    # verbose = args.verbose
+    process_size = args.process_size
+    gap = args.gap
 
+    model_names = []
+    model_dirs = []
+
+    for model_loc in [model_locs]:
+        if os.path.isfile(model_locs):
+            model_names.append(os.path.splitext(model_loc)[0])
+            model_dirs.append(model_loc)
+        elif os.path.isdir(model_locs):
+            model_files_sub = os.listdir(model_loc)
+            model_names_sub = [os.path.splitext(model_file)[0] for model_file in model_files_sub]
+            model_dirs_sub = [os.path.join(model_loc, model_file) for model_file in model_files_sub]
+            model_names.append(model_names_sub)
+        else:
+            raise ValueError('In {}: Not file or directory'.format(model_loc))
+
+    attack(save_dir, process_size, model_names, model_dirs, gap)
