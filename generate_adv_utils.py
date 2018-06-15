@@ -48,7 +48,7 @@ def generate_orig():
 
 def read_orig(gap):
     with h5py.File("orig.h5", "r") as hf:
-        return hf['image'][::gap], hf['label'][::gap], hf['mean'][:]
+        return hf['image'][::gap], hf['label'][::gap], hf['mean'][:] # [:] to get value from dataset
 
 def clip_image(image):
     return np.clip(image, 0, 1)
@@ -167,10 +167,10 @@ def attack_worker(arg_list):
     thread_list.append(threading.Thread(target=attack_group_2, kwargs=my_args_dict))
     thread_list.append(threading.Thread(target=attack_group_3, kwargs=my_args_dict))
     # attack_group_1(model_adv, model_name, save_dir, threading.Lock(), gap)
-    # for thread in thread_list:
-    #     thread.start()
-    # for thread in thread_list:
-    #     thread.join()
+    for thread in thread_list:
+        thread.start()
+    for thread in thread_list:
+        thread.join()
     print("--- " + model_name + "takes %s seconds ---\n" % (time.time() - start))
 
 
