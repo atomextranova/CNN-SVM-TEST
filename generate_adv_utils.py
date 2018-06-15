@@ -40,7 +40,7 @@ def generate_orig():
 
         # Save data
         with h5py.File("orig.h5", "w") as hf:
-            hf.create_dataset(name='image', data=y_train)
+            hf.create_dataset(name='image', data=x_test)
             hf.create_dataset(name='label', data=y_test)
             hf.create_dataset(name='mean', data=x_train_mean)
 
@@ -48,7 +48,7 @@ def generate_orig():
 
 def read_orig(gap):
     with h5py.File("orig.h5", "r") as hf:
-        return hf['image'][::gap], hf['label'][::gap], hf['mean']
+        return hf['image'][::gap], hf['label'][::gap], hf['mean'][:]
 
 def clip_image(image):
     return np.clip(image, 0, 1)
@@ -74,7 +74,7 @@ def attack_wrapper(save_dir, model_name, attack, name, gap, lock, part=False):
     record = open(os.path.join(save_base_path, "{}.txt".format(name)), 'w')
     print("--- {} started ---\n".format(name))
     start = time.time()
-    for i, img, label in enumerate(zip(orig_image, orig_label)):
+    for i, (img, label) in enumerate(zip(orig_image, orig_label)):
         # for i in range(1):
         # for i in range(10):
         if i % 10 == 0:
@@ -108,8 +108,12 @@ def attack_wrapper(save_dir, model_name, attack, name, gap, lock, part=False):
     record.close()
     return
 
+def decode_args(arg_list):
+    return arg_list[0], arg_list[1], arg_list[2], arg_list[3]
+
 def attack_group_1(model_adv, model_name, save_dir, lock, gap):
     # start = time.time()
+
     attack_deep_fool_l2 = foolbox.attacks.DeepFoolL2Attack(model_adv)
 
     attack_DFL_INF = foolbox.attacks.DeepFoolLinfinityAttack(model_adv)
@@ -147,33 +151,34 @@ def attack_group_3(model_adv, model_name, save_dir, lock, gap):
 #     attack_wrapper(model, model_name, attack_Single_Pixel, "Single_Pixel", gap, lock)
 #     # print("--- " + str(4) + "takes %s seconds ---\n" % (time.time() - start))
 
-def attack_worker(save_dir, model_name, model_dir, gap):
+def attack_worker(arg_list):
+    save_dir, model_name, model_dir, gap = decode_args(arg_list)
     print("{}: attack started".format(model_name))
     start = time.time()
     model = keras.models.load_model(model_dir)
     print('Successfully loaded model: {}'.format(model_name))
     # make thread ready manually
     model._make_predict_function()
-    model_adv = foolbox.models.KerasModel(model, bounds=(-2, 2), preprocessing=((0, 0, 0), 1))
+    model_adv = foolbox.models.KerasModel(model, bounds=(-1, 1), preprocessing=((0, 0, 0), 1))
 
     thread_list = []
     my_args_dict = dict(model_adv=model_adv, save_dir=save_dir, model_name=model_name, lock=threading.Lock(), gap=gap)
     thread_list.append(threading.Thread(target=attack_group_1, kwargs=my_args_dict))
     thread_list.append(threading.Thread(target=attack_group_2, kwargs=my_args_dict))
     thread_list.append(threading.Thread(target=attack_group_3, kwargs=my_args_dict))
-
-    for thread in thread_list:
-        thread.start()
-    for thread in thread_list:
-        thread.join()
+    # attack_group_1(model_adv, model_name, save_dir, threading.Lock(), gap)
+    # for thread in thread_list:
+    #     thread.start()
+    # for thread in thread_list:
+    #     thread.join()
     print("--- " + model_name + "takes %s seconds ---\n" % (time.time() - start))
 
 
 def attack(save_dir, process_size, model_names, model_dirs, gap):
     generate_orig()
     attacker_pool = multiprocessing.Pool(processes=process_size)
-    for model_name, model_dir in zip(model_names, model_dirs):
-        attacker_pool.map(attack_worker, (save_dir, model_name, model_dir, gap))
+    for model_name, model_dir in list(zip(model_names, model_dirs)):
+        attacker_pool.map(attack_worker, [[save_dir, model_name, model_dir, gap]])
 
 
 if __name__ == "__main__":
@@ -206,15 +211,16 @@ if __name__ == "__main__":
     model_names = []
     model_dirs = []
 
-    for model_loc in [model_locs]:
-        if os.path.isfile(model_locs):
+    for model_loc in model_locs:
+        if os.path.isfile(model_loc):
             model_names.append(os.path.splitext(model_loc)[0])
             model_dirs.append(model_loc)
-        elif os.path.isdir(model_locs):
-            model_files_sub = os.listdir(model_loc)
+        elif os.path.isdir(model_loc):
+            model_files_sub =[file for file in os.listdir(model_loc) if file.startswith('cifar') and file.endswith('.h5')]
             model_names_sub = [os.path.splitext(model_file)[0] for model_file in model_files_sub]
             model_dirs_sub = [os.path.join(model_loc, model_file) for model_file in model_files_sub]
-            model_names.append(model_names_sub)
+            model_names.extend(model_names_sub)
+            model_dirs.extend(model_dirs_sub)
         else:
             raise ValueError('In {}: Not file or directory'.format(model_loc))
 
