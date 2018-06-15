@@ -77,15 +77,14 @@ def attack_wrapper(save_dir, model_name, attack, name, gap, lock, part=False):
     for i, (img, label) in enumerate(zip(orig_image, orig_label)):
         # for i in range(1):
         # for i in range(10):
-        if i % 10 == 0:
-            print("Generateing %d images with gap %d\n" % (i, gap))
+        # if i % 10 == 0:
+        #     print("Generateing %d images with gap %d\n" % (i, gap))
         adv_image = attack(img, label)
         if adv_image is not None:
             adv.append(adv_image)
-        # else:
-        #     print("Fail to generate adv image. Appending original image.\n")
-        #     adv.append(orig_image[i * gap])
-        #     count += 1
+        else:
+            print("Fail to generate adv image. Appending original image.\n")
+            adv.append(orig_image[i])
     adv = np.array(adv, 'float32')
     completion_msg = "--- {} {} seconds ---\n".format(name, (time.time() - start))
     print(completion_msg)
@@ -119,7 +118,7 @@ def attack_group_1(model_adv, model_name, save_dir, lock, gap):
     attack_DFL_INF = foolbox.attacks.DeepFoolLinfinityAttack(model_adv)
 
     attack_wrapper(save_dir, model_name, attack_deep_fool_l2, "DeepFool_L_2", gap, lock)
-    attack_wrapper(model_name, attack_DFL_INF, 'DeepFool_L_INF', gap, lock)
+    attack_wrapper(save_dir, model_name, attack_DFL_INF, 'DeepFool_L_INF', gap, lock)
 
     attack_LBFGSAttack = foolbox.attacks.LBFGSAttack(model_adv)
     attack_wrapper(save_dir, model_name, attack_LBFGSAttack, 'LBGFS', gap, lock)
@@ -163,10 +162,10 @@ def attack_worker(arg_list):
 
     thread_list = []
     my_args_dict = dict(model_adv=model_adv, save_dir=save_dir, model_name=model_name, lock=threading.Lock(), gap=gap)
+    # attack_group_1(model_adv, model_name, save_dir, threading.Lock(), gap)  # Debug line
     thread_list.append(threading.Thread(target=attack_group_1, kwargs=my_args_dict))
     thread_list.append(threading.Thread(target=attack_group_2, kwargs=my_args_dict))
     thread_list.append(threading.Thread(target=attack_group_3, kwargs=my_args_dict))
-    # attack_group_1(model_adv, model_name, save_dir, threading.Lock(), gap)
     for thread in thread_list:
         thread.start()
     for thread in thread_list:
@@ -177,8 +176,8 @@ def attack_worker(arg_list):
 def attack(save_dir, process_size, model_names, model_dirs, gap):
     generate_orig()
     attacker_pool = multiprocessing.Pool(processes=process_size)
-    for model_name, model_dir in list(zip(model_names, model_dirs)):
-        attacker_pool.map(attack_worker, [[save_dir, model_name, model_dir, gap]])
+    args_list = [[save_dir, model_name, model_dir, gap] for model_name, model_dir in list(zip(model_names, model_dirs))]
+    attacker_pool.map(attack_worker, args_list)
 
 
 if __name__ == "__main__":
