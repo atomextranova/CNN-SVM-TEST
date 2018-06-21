@@ -129,11 +129,11 @@ def attack_group(model_adv, process_size, model_name, save_dir, lock, gap):
     # attack_GaussianBlur = foolbox.attacks.GaussianBlurAttack(model_adv)
     # attack_wrapper(save_dir, process_size, model_name, attack_GaussianBlur, "Gaussian_Blur", gap, lock)
     #
-    # attack_IterGradSign = foolbox.attacks.IterativeGradientSignAttack(model_adv)
-    # attack_wrapper(save_dir, process_size, model_name, attack_IterGradSign, "Iter_GradSign", gap, lock)
-    #
-    # attack_IterGrad = foolbox.attacks.IterativeGradientAttack(model_adv)
-    # attack_wrapper(save_dir, process_size, model_name, attack_IterGrad, "Iter_Grad", gap, lock)
+    attack_IterGradSign = foolbox.attacks.IterativeGradientSignAttack(model_adv)
+    attack_wrapper(save_dir, process_size, model_name, attack_IterGradSign, "Iter_GradSign", gap, lock)
+
+    attack_IterGrad = foolbox.attacks.IterativeGradientAttack(model_adv)
+    attack_wrapper(save_dir, process_size, model_name, attack_IterGrad, "Iter_Grad", gap, lock)
     # # # print("--- " + str(1) + "takes %s seconds ---\n" % (time.time() - start))
 
 # def attack_group_1(model_adv, model_name, save_dir, lock, gap):
