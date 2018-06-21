@@ -22,18 +22,25 @@ def resnet_ensemble(clip=False):
                 temp_model.name = file
                 # for layer in temp_model.layers:
                 #     layer.name = file + layer.name
-                if "svm" in file:
-                    temp_model.pop(0)
-                    temp_output = temp_model.layers[-1].output
-                    new_output = temp_output(input_layer)
+                # new_output = None
+                if "svm" not in file:
+                    # temp_model.layers.pop()
+                    # temp_output = temp_model.layers[-1].output
+                    # temp_model_clipped = Model(inputs=temp_model.input, outputs=temp_output, name=file)
+                    # print(temp_model_clipped.summary())
+                    temp_model.layers[-1].activation = keras.layers.activations.linear
+                    # keras.utils.apply_modifications(temp_model)
+                    new_output = temp_model(input_layer)
                 else:
                     new_output = temp_model(input_layer)
                 # new_output.name = file + new_output.name
                 # new_model = new_output
-                new_model = Model(inputs=input_layer, outputs=new_output, name=file)
-                model_list.append(new_model)
-    output_tensors = [model.output for model in model_list]
-    final_output = keras.layers.average(output_tensors)
+                # new_model = Model(inputs=input_layer, outputs=new_output, name=file)
+                # print(new_model.summary)
+                model_list.append(new_output)
+    # output_tensors = [model.output for model in model_list]
+    # final_output = keras.layers.average(output_tensors)
+    final_output = keras.layers.average(model_list)
     ensemble_model = Model(inputs=input_layer, outputs=final_output, name='ensemble')
     print(ensemble_model.summary())
     return ensemble_model, 'Ensemble_ResNet%dv%d' % (depth, version)
@@ -75,18 +82,22 @@ model, model_type = resnet_ensemble()
 model.compile(loss='categorical_crossentropy',
               optimizer='rmsprop',
               metrics=['accuracy'])
-# scores = model.evaluate(x_test, y_test, verbose=1)
-#
-# file = open('result-%s.txt' % model_type, 'w')
-# print('Test loss:', scores[0])
-# print('Test accuracy:', scores[1])
-#
-# file.write('Test loss:' + str(scores[0]))
-# file.write('Test accuracy:' + str(scores[1]))
+scores = model.evaluate(x_test, y_test, verbose=1)
 
-# file.close()
+file = open('result-%s.txt' % model_type, 'w')
+print('Test loss:', scores[0])
+print('Test accuracy:', scores[1])
+
+file.write('Test loss:' + str(scores[0]))
+file.write('Test accuracy:' + str(scores[1]))
+
+file.close()
+
+
 
 model.save('ensemble.h5')
+
+# print(model.predict(x_test[::100]))
 
 #
 # model.save_weights(model_type + '.hdh5')
