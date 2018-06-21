@@ -53,10 +53,11 @@ def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name):
     max_val = np.amax(np.abs(adv_img - image)) * 255
     avg_val = np.sum(np.abs(adv_img - image)) / adv_img.shape[0] / adv_img.shape[1] / adv_img.shape[2] / adv_img.shape[
         3] * 255
+    avg_var = np.var(np.abs(adv_img - image) * 255)
     print("Total for %s attack: %d, Success: %d, rate: %6.4f" % (
         adv_name, total, attack, attack / total))
-    print("Max value change: %10.8f, Min value change %10.8f, Avg value per pixel per channel: %10.8f\n" % (
-        max_val, min_val, avg_val))
+    print("Max value change: %10.8f, Min value change %10.8f, Avg value per pixel per channel: %10.8f with variance %10.8f\n" % (
+        max_val, min_val, avg_val, avg_var))
     return attack, total
 
 
@@ -193,7 +194,7 @@ if __name__ == '__main__':
     #             'Local_search', 'Single_Pixel', 'DeepFool_L_INF', 'Gaussian_Blur']
 
     adv_list = ['DeepFool_L_2',
-            'DeepFool_L_INF', 'Gaussian_Blur']
+            'DeepFool_L_INF', 'Gaussian_Blur',  'Iter_Grad', 'Iter_GradSign']
 
     # adv_list = ['DeepFool_L_2',
     #         'DeepFool_L_INF']
@@ -256,7 +257,7 @@ if __name__ == '__main__':
         report = "{}: average accuracy: {} with variance: {}\n".format(key, avg, std)
         print(report)
         txt_record.write(report)
-    file.save("report-final-6-10-4.xls")
+    file.save("report-final-6-14-2-1.xls")
     # example('DeepFool_L_0', image, pred, label)
     # example('DeepFool_L_2', image, pred, label)
     # example('LBGFS', image, pred, label)

@@ -99,8 +99,7 @@ def attack_wrapper(model, model_name, attack, name, gap, lock, part=False):
     elif gap != 1:
         name += "_gap"
     with h5py.File(os.path.join(save_base_path, "adv_" + name + ".h5"), "w") as hf:
-        hf.create_dataset('adv', data=(adv + x_train_mean))
-        hf.create_dataset('adv_label', data=model.predict(adv))
+        hf.create_dataset('adv', data=np.clip((adv + x_train_mean), 0, 1))
     record.close()
     return
 
@@ -222,7 +221,8 @@ if __name__ == "__main__":
     elif os.path.isdir(model_dir):
         for root, _, files in os.walk(model_dir):
             for model_name in files:
-                if model_name.startswith('ens') or model_name.startswith('cifar'):
+                # if model_name.startswith('ens') or model_name.startswith('cifar'):
+                if model_name.startswith('ens'):
                     model_dir = os.path.join(root, model_name)
                     attack(model_dir, model_name)
 
