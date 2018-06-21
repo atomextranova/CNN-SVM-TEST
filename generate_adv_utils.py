@@ -220,7 +220,7 @@ if __name__ == "__main__":
     parser.add_argument('-m', '--model', nargs='*',
                         help="specify all models or model directories that is to be attacked")
     parser.add_argument('-s', '--save_dir', help="specify the save directory for attack file", default=None)
-    parser.add_argument('-p', '--process_size', help='number of processes', type=int, default=10)
+    parser.add_argument('-p', '--process_size', help='number of processes', type=int, default=1)
     # parser.add_argument('-t', '--thread_num', help='number of threads for each attack', type=int, default=4)
     parser.add_argument('-g', '--gap', help='select images with gap ([::10])', type=int, default=1)
     # parser.add_argument('-v', '--verbose', help="whether print the progress or not", action='store_true')
