@@ -39,8 +39,11 @@ def resnet_ensemble(clip=False):
                 # print(new_model.summary)
                 model_list.append(new_output)
     # output_tensors = [model.output for model in model_list]
-    # final_output = keras.layers.average(output_tensors)
-    final_output = keras.layers.average(model_list)
+    # final_output = keras.;layers.average(output_tensors)
+    if len(model_list) != 1:
+        final_output = keras.layers.average(model_list)
+    else:
+        final_output = model_list[0]
     ensemble_model = Model(inputs=input_layer, outputs=final_output, name='ensemble')
     print(ensemble_model.summary())
     return ensemble_model, 'Ensemble_ResNet%dv%d' % (depth, version)
