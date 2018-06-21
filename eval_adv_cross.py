@@ -51,8 +51,7 @@ def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name):
             attack += 1
     min_val = np.amin(np.abs(adv_img - image)) * 255
     max_val = np.amax(np.abs(adv_img - image)) * 255
-    avg_val = np.sum(np.abs(adv_img - image)) / adv_img.shape[0] / adv_img.shape[1] / adv_img.shape[2] / adv_img.shape[
-        3] * 255
+    avg_val = np.sum(np.abs(adv_img - image)) / adv_img.size * 255
     print("Total for %s attack: %d, Success: %d, rate: %6.4f" % (
         adv_name, total, attack, attack / total))
     print("Max value change: %10.8f, Min value change %10.8f, Avg value per pixel per channel: %10.8f\n" % (

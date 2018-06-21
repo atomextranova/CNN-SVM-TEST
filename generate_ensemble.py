@@ -11,7 +11,7 @@ from keras.layers import Input
 from keras.models import Model
 
 
-def resnet_ensemble():
+def resnet_ensemble(clip=False):
     input_layer = Input(input_shape)
     model_path = sys.argv[1]
     model_list = []
@@ -22,8 +22,12 @@ def resnet_ensemble():
                 temp_model.name = file
                 # for layer in temp_model.layers:
                 #     layer.name = file + layer.name
-
-                new_output = temp_model(input_layer)
+                if "svm" in file:
+                    temp_model.pop(0)
+                    temp_output = temp_model.layers[-1].output
+                    new_output = temp_output(input_layer)
+                else:
+                    new_output = temp_model(input_layer)
                 # new_output.name = file + new_output.name
                 # new_model = new_output
                 new_model = Model(inputs=input_layer, outputs=new_output, name=file)
