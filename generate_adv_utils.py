@@ -75,19 +75,18 @@ def attack_wrapper(save_dir, process_size, model_name, attack, name, gap, lock, 
     record = open(os.path.join(save_base_path, "{}.txt".format(name)), 'w')
     print("--- {} started ---\n".format(name))
     start = time.time()
-    with ProcessPoolExecutor(max_workers=process_size):
-        for i, (img, label) in enumerate(zip(orig_image, orig_label)):
-            # for i in range(1):
-            # for i in range(10):
-            # if i % 10 == 0:
-            #     print("Generateing %d images with gap %d\n" % (i, gap))
-            adv_image = attack(img, label)
-            if adv_image is not None:
-                adv.append(adv_image)
-            else:
-                print("Fail to generate adv image. Appending original image.\n")
-                adv.append(orig_image[i])
-        adv = np.array(adv, 'float32')
+    for i, (img, label) in enumerate(zip(orig_image, orig_label)):
+        # for i in range(1):
+        # for i in range(10):
+        # if i % 10 == 0:
+        #     print("Generateing %d images with gap %d\n" % (i, gap))
+        adv_image = attack(img, label)
+        if adv_image is not None:
+            adv.append(adv_image)
+        else:
+            print("Fail to generate adv image. Appending original image.\n")
+            adv.append(orig_image[i])
+    adv = np.array(adv, 'float32')
     completion_msg = "--- {} {} seconds ---\n".format(name, (time.time() - start))
     print(completion_msg)
     record.write(completion_msg)
@@ -206,11 +205,11 @@ def attack_worker(arg_list):
 
 def attack(save_dir, process_size, model_names, model_dirs, gap):
     generate_orig()
-    # attacker_pool = multiprocessing.Pool(processes=process_size)
-    # args_list = [[save_dir, process_size, model_name, model_dir, gap] for model_name, model_dir in list(zip(model_names, model_dirs))]
-    # map(attack_worker, args_list)
-    for model_name, model_dir in list(zip(model_names, model_dirs)):
-        attack_worker([save_dir, process_size, model_name, model_dir, gap])
+    attacker_pool = multiprocessing.Pool(processes=process_size)
+    args_list = [[save_dir, process_size, model_name, model_dir, gap] for model_name, model_dir in list(zip(model_names, model_dirs))]
+    attacker_pool.map(attack_worker, args_list)
+    # for model_name, model_dir in list(zip(model_names, model_dirs)):
+    #     attack_worker([save_dir, process_size, model_name, model_dir, gap])
 
 if __name__ == "__main__":
     # if len(sys.argv) != 2:
@@ -248,7 +247,7 @@ if __name__ == "__main__":
             model_names.append(os.path.splitext(model_loc)[0])
             model_dirs.append(model_loc)
         elif os.path.isdir(model_loc):
-            model_files_sub =[file for file in os.listdir(model_loc) if file.startswith('ens') and file.endswith('.h5')]
+            model_files_sub =[file for file in os.listdir(model_loc) if file.startswith('cifar') and file.endswith('.h5')]
             model_names_sub = [os.path.splitext(model_file)[0] for model_file in model_files_sub]
             model_dirs_sub = [os.path.join(model_loc, model_file) for model_file in model_files_sub]
             model_names.extend(model_names_sub)
