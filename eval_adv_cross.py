@@ -177,8 +177,10 @@ if __name__ == '__main__':
 
 
     model_list = [os.path.join(file_dir, file) for file in file_name]
+    model_list.append('clip_ensemble\\ensemble')
     model_list_adv = ['clip_ensemble\\ensemble']
     worksheet_name = list(map(condition, file_name))
+    worksheet_name.append('ensemble')
 
     # for i, item in enumerate(model_list):
     #     model_list[i] = "attack/"+item
@@ -192,11 +194,11 @@ if __name__ == '__main__':
     # adv_list = ['DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
     #             'Local_search', 'Single_Pixel', 'DeepFool_L_INF', 'Gaussian_Blur']
 
-    adv_list = ['DeepFool_L_2',
-            'DeepFool_L_INF', 'Gaussian_Blur',  'Iter_Grad', 'Iter_GradSign']
-
     # adv_list = ['DeepFool_L_2',
-    #         'DeepFool_L_INF']
+    #         'DeepFool_L_INF', 'Gaussian_Blur',  'Iter_Grad', 'Iter_GradSign']
+
+    adv_list = ['DeepFool_L_2',
+            'DeepFool_L_INF']
 
     # for model_name in model_list:
     #     for adv_dataset in adv_list:

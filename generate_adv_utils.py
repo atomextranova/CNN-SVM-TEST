@@ -10,7 +10,7 @@ import keras
 import numpy as np
 from keras.datasets import cifar10
 
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, as_completed, ThreadPoolExecutor
 
 
 def generate_orig():
@@ -55,7 +55,15 @@ def read_orig(gap):
 def clip_image(image):
     return np.clip(image, 0, 1)
 
-def attack_wrapper(save_dir, process_size, model_name, attack, name, gap, lock, part=False):
+def utils_adv(attacker, img, label):
+        adv_image = attack(img, label)
+        if adv_image is not None:
+            return adv_image
+        else:
+            print("Fail to generate adv image. Appending original image.\n")
+            return label
+
+def attack_wrapper(save_dir, model_name, attack, name, gap, lock, part=False):
     orig_image, orig_label, mean_of_image = read_orig(gap)
     save_base_path = os.path.join(save_dir, model_name)
 
@@ -75,6 +83,8 @@ def attack_wrapper(save_dir, process_size, model_name, attack, name, gap, lock, 
     record = open(os.path.join(save_base_path, "{}.txt".format(name)), 'w')
     print("--- {} started ---\n".format(name))
     start = time.time()
+    # with ThreadPoolExecutor(max_workers=os.cpu_count()):
+
     for i, (img, label) in enumerate(zip(orig_image, orig_label)):
         # for i in range(1):
         # for i in range(10):
@@ -120,8 +130,8 @@ def attack_group(model_adv, process_size, model_name, save_dir, lock, gap):
 
     attack_DFL_INF = foolbox.attacks.DeepFoolLinfinityAttack(model_adv)
 
-    attack_wrapper(save_dir, process_size, model_name, attack_deep_fool_l2, "DeepFool_L_2", gap, lock)
-    attack_wrapper(save_dir, process_size, model_name, attack_DFL_INF, 'DeepFool_L_INF', gap, lock)
+    attack_wrapper(save_dir, model_name, attack_deep_fool_l2, "DeepFool_L_2", gap, lock)
+    attack_wrapper(save_dir, model_name, attack_DFL_INF, 'DeepFool_L_INF', gap, lock)
 
     # attack_LBFGSAttack = foolbox.attacks.LBFGSAttack(model_adv)
     # attack_wrapper(save_dir, process_size, model_name, attack_LBFGSAttack, 'LBGFS', gap, lock)
@@ -136,39 +146,39 @@ def attack_group(model_adv, process_size, model_name, save_dir, lock, gap):
     # attack_wrapper(save_dir, process_size, model_name, attack_IterGrad, "Iter_Grad", gap, lock)
     # # # print("--- " + str(1) + "takes %s seconds ---\n" % (time.time() - start))
 
-# def attack_group_1(model_adv, model_name, save_dir, lock, gap):
-#     # start = time.time()
-#
-#     attack_deep_fool_l2 = foolbox.attacks.DeepFoolL2Attack(model_adv)
-#
-#     attack_DFL_INF = foolbox.attacks.DeepFoolLinfinityAttack(model_adv)
-#
-#     attack_wrapper(save_dir, model_name, attack_deep_fool_l2, "DeepFool_L_2", gap, lock)
-#     attack_wrapper(save_dir, model_name, attack_DFL_INF, 'DeepFool_L_INF', gap, lock)
-#
-#     attack_LBFGSAttack = foolbox.attacks.LBFGSAttack(model_adv)
-#     attack_wrapper(save_dir, model_name, attack_LBFGSAttack, 'LBGFS', gap, lock)
-#
-#     attack_GaussianBlur = foolbox.attacks.GaussianBlurAttack(model_adv)
-#     attack_wrapper(save_dir, model_name, attack_GaussianBlur, "Gaussian_Blur", gap, lock)
-#
-#     attack_IterGrad = foolbox.attacks.IterativeGradientAttack(model_adv)
-#     attack_wrapper(save_dir, model_name, attack_IterGrad, "Iter_Grad", gap, lock)
-#     # # print("--- " + str(1) + "takes %s seconds ---\n" % (time.time() - start))
-#
-#
-# def attack_group_2(model_adv, model_name, save_dir, lock, gap):
-#     # start = time.time()
-#     attack_IterGradSign = foolbox.attacks.IterativeGradientSignAttack(model_adv)
-#     attack_wrapper(save_dir, model_name, attack_IterGradSign, "Iter_GradSign", gap, lock)
-#     # print("--- " + str(2) + "takes %s seconds ---\n" % (time.time() - start))
-#
-#
-# def attack_group_3(model_adv, model_name, save_dir, lock, gap):
-#     # start = time.time()
-#     attack_IterGrad = foolbox.attacks.IterativeGradientAttack(model_adv)
-#     attack_wrapper(save_dir, model_name, attack_IterGrad, "Iter_Grad", gap, lock)
-#     # print("--- " + str(3) + "takes %s seconds ---\n" % (time.time() - start))
+def attack_group_1(model_adv, model_name, save_dir, lock, gap):
+    # start = time.time()
+
+    attack_deep_fool_l2 = foolbox.attacks.DeepFoolL2Attack(model_adv)
+
+    attack_DFL_INF = foolbox.attacks.DeepFoolLinfinityAttack(model_adv)
+
+    attack_wrapper(save_dir, model_name, attack_deep_fool_l2, "DeepFool_L_2", gap, lock)
+    attack_wrapper(save_dir, model_name, attack_DFL_INF, 'DeepFool_L_INF', gap, lock)
+
+    attack_LBFGSAttack = foolbox.attacks.LBFGSAttack(model_adv)
+    attack_wrapper(save_dir, model_name, attack_LBFGSAttack, 'LBGFS', gap, lock)
+
+    attack_GaussianBlur = foolbox.attacks.GaussianBlurAttack(model_adv)
+    attack_wrapper(save_dir, model_name, attack_GaussianBlur, "Gaussian_Blur", gap, lock)
+
+    # attack_IterGrad = foolbox.attacks.IterativeGradientAttack(model_adv)
+    # attack_wrapper(save_dir, model_name, attack_IterGrad, "Iter_Grad", gap, lock)
+    # # print("--- " + str(1) + "takes %s seconds ---\n" % (time.time() - start))
+
+
+def attack_group_2(model_adv, model_name, save_dir, lock, gap):
+    # start = time.time()
+    attack_IterGradSign = foolbox.attacks.IterativeGradientSignAttack(model_adv)
+    attack_wrapper(save_dir, model_name, attack_IterGradSign, "Iter_GradSign", gap, lock)
+    # print("--- " + str(2) + "takes %s seconds ---\n" % (time.time() - start))
+
+
+def attack_group_3(model_adv, model_name, save_dir, lock, gap):
+    # start = time.time()
+    attack_IterGrad = foolbox.attacks.IterativeGradientAttack(model_adv)
+    attack_wrapper(save_dir, model_name, attack_IterGrad, "Iter_Grad", gap, lock)
+    # print("--- " + str(3) + "takes %s seconds ---\n" % (time.time() - start))
 
 
 # def attack_group_4(model_adv, model, model_name, lock):
@@ -190,16 +200,16 @@ def attack_worker(arg_list):
     model_adv = foolbox.models.KerasModel(model, bounds=(-1, 1), preprocessing=((0, 0, 0), 1))
 
     thread_list = []
-    my_args_dict = dict(model_adv=model_adv, process_size=process_size, save_dir=save_dir, model_name=model_name, lock=threading.Lock(), gap=gap)
-    attack_group(model_adv, process_size, model_name, save_dir, threading.Lock(), gap)
+    my_args_dict = dict(model_adv=model_adv, save_dir=save_dir, model_name=model_name, lock=threading.Lock(), gap=gap)
+    # attack_group(model_adv, process_size, model_name, save_dir, threading.Lock(), gap)
     # attack_group_1(model_adv, model_name, save_dir, threading.Lock(), gap)  # Debug line
-    # thread_list.append(threading.Thread(target=attack_group_1, kwargs=my_args_dict))
-    # thread_list.append(threading.Thread(target=attack_group_2, kwargs=my_args_dict))
-    # thread_list.append(threading.Thread(target=attack_group_3, kwargs=my_args_dict))
-    # for thread in thread_list:
-    #     thread.start()
-    # for thread in thread_list:
-    #     thread.join()
+    thread_list.append(threading.Thread(target=attack_group_1, kwargs=my_args_dict))
+    thread_list.append(threading.Thread(target=attack_group_2, kwargs=my_args_dict))
+    thread_list.append(threading.Thread(target=attack_group_3, kwargs=my_args_dict))
+    for thread in thread_list:
+        thread.start()
+    for thread in thread_list:
+        thread.join()
     print("--- " + model_name + "takes %s seconds ---\n" % (time.time() - start))
 
 
@@ -247,7 +257,7 @@ if __name__ == "__main__":
             model_names.append(os.path.splitext(model_loc)[0])
             model_dirs.append(model_loc)
         elif os.path.isdir(model_loc):
-            model_files_sub =[file for file in os.listdir(model_loc) if file.startswith('cifar') and file.endswith('.h5')]
+            model_files_sub =[file for file in os.listdir(model_loc) if file.startswith('ens') and file.endswith('.h5')]
             model_names_sub = [os.path.splitext(model_file)[0] for model_file in model_files_sub]
             model_dirs_sub = [os.path.join(model_loc, model_file) for model_file in model_files_sub]
             model_names.extend(model_names_sub)
