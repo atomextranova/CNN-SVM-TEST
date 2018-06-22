@@ -47,7 +47,7 @@ def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name):
     adv_label = model.predict(adv_img-mean)
     total = 1000
     for i in range(adv_label.shape[0]):
-        if label[i*10] != np.argmax(adv_label[i]):
+        if label[i] != np.argmax(adv_label[i]):
             attack += 1
     min_val = np.amin(np.abs(adv_img - image)) * 255
     max_val = np.amax(np.abs(adv_img - image)) * 255
@@ -139,6 +139,7 @@ if __name__ == '__main__':
     # label = np.take(label, choice)
 
     img = image[::10]
+    label = label[::10]
 
     # label = label[::10]
     with h5py.File("attack/mean.h5", "r") as hf:
@@ -194,11 +195,11 @@ if __name__ == '__main__':
     # adv_list = ['DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
     #             'Local_search', 'Single_Pixel', 'DeepFool_L_INF', 'Gaussian_Blur']
 
-    # adv_list = ['DeepFool_L_2',
-    #         'DeepFool_L_INF', 'Gaussian_Blur',  'Iter_Grad', 'Iter_GradSign']
-
     adv_list = ['DeepFool_L_2',
-            'DeepFool_L_INF']
+            'DeepFool_L_INF', 'Gaussian_Blur',  'Iter_Grad']
+
+    # adv_list = ['DeepFool_L_2',
+    #         'DeepFool_L_INF']
 
     # for model_name in model_list:
     #     for adv_dataset in adv_list:
