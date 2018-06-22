@@ -46,11 +46,9 @@ def resnet_ensemble(clip=False):
         final_output = model_list[0]
     ensemble_model = Model(inputs=input_layer, outputs=final_output, name='ensemble')
     print(ensemble_model.summary())
-    return ensemble_model, 'Ensemble_ResNet%dv%d' % (depth, version)
+    return ensemble_model, 'Ensemble_ResNet{}'.format()
 
 
-depth = 20
-version = 3
 num_classes = 10
 
 subtract_pixel_mean = True
@@ -65,11 +63,10 @@ input_shape = x_train.shape[1:]
 x_train = x_train.astype('float32') / 255
 x_test = x_test.astype('float32') / 255
 
-# If subtract pixel mean is enabled
-if subtract_pixel_mean:
-    x_train_mean = np.mean(x_train, axis=0)
-    x_train -= x_train_mean
-    x_test -= x_train_mean
+
+x_train_mean = np.mean(x_train, axis=0)
+x_train -= x_train_mean
+x_test -= x_train_mean
 
 print('x_train shape:', x_train.shape)
 print(x_train.shape[0], 'train samples')
