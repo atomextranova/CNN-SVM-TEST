@@ -1,17 +1,17 @@
 from __future__ import print_function
 
+import argparse
+import itertools
 import os
-import sys
 
+import h5py
 # os.environ["CUDA_VISIBLE_DEVICES"]="1"
 import keras
 import numpy as np
 from keras.datasets import cifar10
 from keras.layers import Input
 from keras.models import Model
-import h5py
-import argparse
-import itertools
+
 
 def generate_resnet_ensemble(subset, save_dir, input_layer, model_name):
     child_model_list = []
@@ -21,15 +21,13 @@ def generate_resnet_ensemble(subset, save_dir, input_layer, model_name):
     file = open(record_path, 'w')
 
     file.write('Model component:\n')
-    for model_dir in subset:
-        temp_model = keras.models.load_model(model_dir)
-        temp_model.name = os.path.basename(model_dir)
-        file.write(model_dir+'\n')
-        print('Using {}'.format(model_dir))
+    for temp_model in subset:
+        file.write(temp_model.name + '\n')
+        print('Using {}'.format(temp_model.name))
         # for layer in temp_model.layers:
         #     layer.name = file + layer.name
         # new_output = None
-        if "svm" not in model_dir:
+        if "svm" not in temp_model.name:
             # temp_model.layers.pop()
             # temp_output = temp_model.layers[-1].output
             # temp_model_clipped = Model(inputs=temp_model.input, outputs=temp_output, name=file)
@@ -49,12 +47,13 @@ def generate_resnet_ensemble(subset, save_dir, input_layer, model_name):
     ensemble_model = Model(inputs=input_layer, outputs=final_output, name='ensemble')
     print(ensemble_model.summary())
     ensemble_model.compile(loss='categorical_crossentropy',
-                  optimizer='rmsprop',
-                  metrics=['accuracy'])
+                           optimizer='rmsprop',
+                           metrics=['accuracy'])
     file.write('\n')
     print('{} done'.format(model_name))
     file.close()
     return ensemble_model
+
 
 def evaluate_model(save_dir, ensemble_model, model_name, orig_image, orig_label, mean_of_image):
     record_name = 'result-{}.txt'.format(model_name)
@@ -70,19 +69,21 @@ def evaluate_model(save_dir, ensemble_model, model_name, orig_image, orig_label,
 
     file.close()
 
-def generate_resnet_ensemble_batch(model_locs, save_dir, image_shape, orig_image, orig_label, mean_of_image=[0, 0, 0], nums=[2, 3]):
+
+def generate_resnet_ensemble_batch(model_locs, save_dir, image_shape, orig_image, orig_label, mean_of_image=(0, 0, 0),
+                                   nums=(2, 3)):
     orig_label = keras.utils.to_categorical(orig_label, 10)
     input_layer = Input(image_shape)
     model_list = []
     for root, _, files in os.walk(model_locs):
         for file in files:
-            if file.endswith('h5'):
-                model_list.append(os.path.join(root, file))
-
-    for model_dir in model_list:
-        model = keras.models.load_model(model_dir)
-        model_name = os.path.basename(model_dir)
-        evaluate_model(save_dir, model, model_name, orig_image, orig_label, mean_of_image)
+            if file.endswith('h5') and file.startwith('cifar'):
+                model_dir = os.path.join(root, file)
+                model = keras.models.load_model(model_dir)
+                model_name = file
+                model.name = file
+                evaluate_model(save_dir, model, model_name, orig_image, orig_label, mean_of_image)
+                model_list.append(model)
 
     for ensemble_num in nums:
         for i, subset in enumerate(itertools.combinations(model_list, ensemble_num)):
@@ -91,6 +92,7 @@ def generate_resnet_ensemble_batch(model_locs, save_dir, image_shape, orig_image
             ensemble_dir = os.path.join(save_dir, '{}.h5'.format(model_name))
             ensemble_model.save(ensemble_dir)
             evaluate_model(save_dir, ensemble_model, model_name, orig_image, orig_label, mean_of_image)
+
 
 def generate_orig():
     if not os.path.exists('orig.h5'):
@@ -126,10 +128,9 @@ def generate_orig():
             hf.create_dataset(name='mean', data=x_train_mean)
 
 
-
 def read_orig(gap):
     with h5py.File("orig.h5", "r") as hf:
-        return hf['image'][::gap], hf['label'][::gap], hf['mean'][:] # [:] to get value from dataset
+        return hf['image'][::gap], hf['label'][::gap], hf['mean'][:]  # [:] to get value from dataset
 
 
 if __name__ == "__main__":
