@@ -77,7 +77,7 @@ def generate_resnet_ensemble_batch(model_locs, save_dir, image_shape, orig_image
     model_list = []
     for root, _, files in os.walk(model_locs):
         for file in files:
-            if file.endswith('h5') and file.startwith('cifar'):
+            if file.endswith('h5') and file.startswith('cifar'):
                 model_dir = os.path.join(root, file)
                 model = keras.models.load_model(model_dir)
                 model_name = file
