@@ -85,7 +85,13 @@ def generate_resnet_ensemble_batch(model_locs, save_dir, image_shape, orig_image
                 evaluate_model(save_dir, model, model_name, orig_image, orig_label, mean_of_image)
                 model_list.append(model)
 
+    print('Independent model candidates: ')
+    for model in model_list:
+        print(model.name)
+
+
     for ensemble_num in nums:
+        print('Start generating ensembles of length {}'.format(ensemble_num))
         for i, subset in enumerate(itertools.combinations(model_list, ensemble_num)):
             model_name = 'ensemble_of_{}_{}'.format(ensemble_num, i)
             ensemble_model = generate_resnet_ensemble(subset, save_dir, input_layer, model_name)
@@ -142,7 +148,7 @@ if __name__ == "__main__":
     parser.add_argument('-m', '--model',
                         help="specify all models or model directories that is to be attacked")
     parser.add_argument('-s', '--save_dir', help="specify the save directory for attack file", default=None)
-    parser.add_argument('-g', '--gap', help='select images with gap ([::10])', type=int, default=10)
+    parser.add_argument('-g', '--gap', help='select images with gap ([::10])', type=int, default=1)
     args = parser.parse_args()
 
     model_locs = args.model
@@ -159,7 +165,3 @@ if __name__ == "__main__":
     orig_image, orig_label, mean_of_image = read_orig(gap)
     image_shape = mean_of_image.shape
     generate_resnet_ensemble_batch(model_locs, save_dir, image_shape, orig_image, orig_label, mean_of_image)
-# print(model.predict(x_test[::100]))
-
-#
-# model.save_weights(model_type + '.hdh5')
