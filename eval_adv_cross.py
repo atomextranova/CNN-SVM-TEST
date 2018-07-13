@@ -144,35 +144,11 @@ if __name__ == '__main__':
     # label = label[::10]
     with h5py.File("attack/mean.h5", "r") as hf:
         mean = hf['mean'][:]
-    # model_list = ["cifar10_ResNet20v1_model.194",
-    #               "cifar10_ResNetSVM20v3_model.028.25.0.0001",
-    #               "cifar10_ResNetSVM20v3_model.156.35.0.001",
-    #               "cifar10_ResNetSVM20v3_model.158.5.0.001",
-    #               "cifar10_ResNetSVM20v3_model.158.40.0.001",
-    #               "cifar10_ResNetSVM20v3_model.158.10.0.001",
-    #               "cifar10_ResNetSVM20v3_model.195.0.5.0.001",
-    #               "cifar10_ResNetSVM20v3_model.170.0.1.L1.0.001",
-    #               "cifar10_ResNetSVM20v3_model.147.0.15.L1.0.001",
-    #               "cifar10_ResNetSVM20v3_model.121.0.2.L1.0.001",
-    #               "cifar10_ResNetSVM20v3_model.121.0.25.L1.0.001",
-    #               "cifar10_ResNetSVM20v3_model.125.0.3.L1.0.001",
-    #               "cifar10_ResNetSVM20v3_model.195.0.1.0.5.L1.0.001",
-    #               # "cifar10_ResNetSVM20v3_model.147.0.1.5.L1.0.001",
-    #               "cifar10_ResNetSVM20v3_model.122.0.1.10.L1.0.001",
-    #               "cifar10_ResNetSVM20v3_model.143.0.15.0.5.L1.0.001",
-    #               "cifar10_ResNetSVM20v3_model.116.0.15.2.L1.0.001",
-    #               "cifar10_ResNetSVM20v3_model.192.0.15.5.L1.0.001",
-    #               "cifar10_ResNetSVM20v3_model.182.0.15.10.L1.0.001",]
-
-    # for root, _, file in os.walk(sys.argv[1]):
-    #     if (file.startwith("cifar")):
-    #
 
     file_dir = sys.argv[1]
     file_name = [os.path.splitext(file)[0] for file in os.listdir(file_dir) if os.path.isfile(os.path.join(file_dir, file))
                   and file.startswith('cifar')
                   and file.endswith('.h5')]
-
     # xlwt requires less than 31
     # worksheet_name = [name for name in worksheet_name if len(name) < 30]
 

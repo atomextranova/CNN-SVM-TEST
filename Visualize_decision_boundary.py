@@ -5,21 +5,6 @@ import os
 from keras import backend as K
 import numpy as np
 
-class Adversarial:
-
-    def __init__(self,  model):
-        label_input = K.placeholder(shape=(1,))
-        image_input = model.input
-        output = model.output
-        loss = K.sparse_categorical_crossentropy(label_input, output, from_logits=True)
-        grads = K.gradients(loss, image_input)
-        grad = grads[0]
-        self.grad_func = K.function([image_input, label_input], [grad])
-
-    def iterative_fast_gradient_base(self, image, label, model, preprocessing=(0, 0, 0), clipped=True, sign=False):
-        epsilons = np.linspace(0, 0.1, num=51)[1:]
-
-
 
 def read_model(file_dir, key, svm=False):
 
@@ -51,7 +36,7 @@ if __name__ == '__main__':
     with h5py.File("attack/mean.h5", "r") as hf:
         mean = hf['mean'][:]
 
-    image, _, label = read_orig(10)
+    image, _, label = read_orig(10000)
     image = np.expand_dims(image, axis=0)
 
     factor = 0.1
@@ -65,10 +50,39 @@ if __name__ == '__main__':
 
     # svm_list = read_model(file_dir, 'cifar', True)
 
+
+
     for model in cnn_list:
-        fast
 
+        label_input = K.placeholder(shape=(1,))
+        image_input = model.input
+        output = model.output
+        loss = K.sparse_categorical_crossentropy(label_input, output, from_logits=True)
+        grads = K.gradients(loss, image_input)
+        grad = grads[0]
+        grad_func = K.function([image_input, label_input], [grad])
 
+        for img, lab in zip(image, label):
+            image_list = []
+            cur_grad = grad_func([img, lab])
+            cur_grad_normalized = cur_grad / np.sqrt(np.sum(np.square(cur_grad)))
+            for step_grad in range(step_size):
+                for step_unit in range(step_size):
+                    temp_img = img + np.multiply(step_grad,cur_grad) + np.multiply(step_unit,unit_vec)
+                    temp_img_clipped = np.clip(temp_img, 0, 1)
+                    image_list.extend(temp_img_clipped)
+                    # temp_img = np.expand_dims(img, axis=0) + step_grad *
+            pass
+            image_array = np.concatenate(image_list)
+            result_list = model.predict(image_array)
+            print(result_list)
+            pass
+            pass
             # cur_grad_min = cur_grad.min(axis=(0, 1), keepdims=True)
             # cur_grad_max = cur_grad.max(axis=(0, 1), keepdims=True)
             # cur_grad_norm = (cur_grad - cur_grad_min) / (cur_grad_max - cur_grad_min)
+
+
+
+
+
