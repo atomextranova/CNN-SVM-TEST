@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="96a1f8d9-4129-47a8-8da3-fcb343c833b5" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/Visualize_decision_boundary.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FGSM.py" beforeDir="false" afterPath="$PROJECT_DIR$/FGSM.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eval_adv_cross.py" beforeDir="false" afterPath="$PROJECT_DIR$/eval_adv_cross.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generate_adv_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/generate_adv_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generate_svm.py" beforeDir="false" afterPath="$PROJECT_DIR$/generate_svm.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -19,50 +15,27 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/CNN_SVM$generate_svm.coverage" NAME="generate_svm Coverage Results" MODIFIED="1530491120037" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CNN_SVM$eval_invalid_ex.coverage" NAME="eval_invalid_ex Coverage Results" MODIFIED="1528512026791" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CNN_SVM$FGSM.coverage" NAME="FGSM Coverage Results" MODIFIED="1531537375771" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CNN_SVM$demo.coverage" NAME="demo Coverage Results" MODIFIED="1525137620091" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CNN_SVM$generate_ensemble_new.coverage" NAME="generate_ensemble_new Coverage Results" MODIFIED="1529713467794" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CNN_SVM$generate_ensemble.coverage" NAME="generate_ensemble Coverage Results" MODIFIED="1529635150072" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CNN_SVM$eval_adv_cross.coverage" NAME="eval_adv_cross Coverage Results" MODIFIED="1529678415250" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CNN_SVM$clip_image.coverage" NAME="clip_image Coverage Results" MODIFIED="1529074210867" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CNN_SVM$generate_adv_utils.coverage" NAME="generate_adv_utils Coverage Results" MODIFIED="1531430189372" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CNN_SVM$Visualize_decision_boundary.coverage" NAME="Visualize_decision_boundary Coverage Results" MODIFIED="1531450071912" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CNN_SVM$Visualize_decision_boundary.coverage" NAME="Visualize_decision_boundary Coverage Results" MODIFIED="1531506438265" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CNN_SVM$eval_model.coverage" NAME="eval_model Coverage Results" MODIFIED="1525137577561" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FileEditorManager">
     <splitter split-orientation="horizontal" split-proportion="0.5">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="eval_adv_cross.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/eval_adv_cross.py">
+          <file leaf-file-name="generate_ensemble_new.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/generate_ensemble_new.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-334">
-                  <caret line="155" column="46" selection-start-line="155" selection-start-column="18" selection-end-line="155" selection-end-column="46" />
-                  <folding>
-                    <element signature="e#0#9#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="generate_ensemble.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/generate_ensemble.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="688">
-                  <caret line="78" selection-start-line="78" selection-end-line="78" />
+                <state relative-caret-position="-1653">
+                  <caret line="15" column="30" selection-start-line="15" selection-start-column="30" selection-end-line="15" selection-end-column="30" />
                   <folding>
                     <element signature="e#0#37#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="Visualize_decision_boundary.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/Visualize_decision_boundary.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="57">
-                  <caret line="8" selection-start-line="8" selection-end-line="31" selection-end-column="71" />
-                  <folding>
-                    <element signature="e#0#12#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -71,8 +44,8 @@
           <file leaf-file-name="FGSM.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/FGSM.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="61">
-                  <caret line="7" column="54" selection-start-line="7" selection-start-column="54" selection-end-line="7" selection-end-column="54" />
+                <state relative-caret-position="287">
+                  <caret line="206" column="44" lean-forward="true" selection-start-line="206" selection-start-column="44" selection-end-line="206" selection-end-column="44" />
                   <folding>
                     <element signature="e#0#12#0" expanded="true" />
                   </folding>
@@ -80,47 +53,14 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="numeric.py" pinned="false" current-in-tab="false">
-            <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/numpy/core/numeric.py">
+          <file leaf-file-name="Visualize_decision_boundary.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Visualize_decision_boundary.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="199">
-                  <caret line="187" selection-start-line="187" selection-end-line="187" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="session.py" pinned="false" current-in-tab="false">
-            <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/tensorflow/python/client/session.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="199">
-                  <caret line="1115" selection-start-line="1115" selection-end-line="1115" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="ops.py" pinned="false" current-in-tab="false">
-            <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/tensorflow/python/framework/ops.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="199">
-                  <caret line="3566" selection-start-line="3566" selection-end-line="3566" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="tensorflow_backend.py" pinned="false" current-in-tab="false">
-            <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/keras/backend/tensorflow_backend.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="199">
-                  <caret line="3041" selection-start-line="3041" selection-end-line="3041" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="training.py" pinned="false" current-in-tab="false">
-            <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/keras/engine/training.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="247">
-                  <caret line="112" selection-start-line="112" selection-end-line="112" />
+                <state relative-caret-position="-473">
+                  <caret line="39" selection-start-line="39" selection-end-line="39" selection-end-column="41" />
+                  <folding>
+                    <element signature="e#0#12#0" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -128,8 +68,8 @@
           <file leaf-file-name="generate_adv_utils.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/generate_adv_utils.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1738">
-                  <caret line="171" column="49" selection-start-line="171" selection-start-column="49" selection-end-line="171" selection-end-column="49" />
+                <state relative-caret-position="303">
+                  <caret line="262" column="30" selection-start-line="262" selection-start-column="24" selection-end-line="262" selection-end-column="30" />
                   <folding>
                     <element signature="e#0#15#0" expanded="true" />
                   </folding>
@@ -144,8 +84,8 @@
           <file leaf-file-name="keras.py" pinned="false" current-in-tab="false">
             <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/foolbox/models/keras.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-835">
-                  <caret line="51" column="8" selection-start-line="51" selection-start-column="8" selection-end-line="51" selection-end-column="8" />
+                <state relative-caret-position="-698">
+                  <caret line="64" column="16" selection-start-line="64" selection-start-column="16" selection-end-line="64" selection-end-column="16" />
                 </state>
               </provider>
             </entry>
@@ -159,11 +99,14 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="gradientsign.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="gradientsign.py" pinned="false" current-in-tab="false">
             <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/foolbox/attacks/gradientsign.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-604">
-                  <caret line="88" column="9" selection-start-line="88" selection-start-column="9" selection-end-line="88" selection-end-column="9" />
+                <state relative-caret-position="1461">
+                  <caret line="88" column="14" selection-start-line="88" selection-start-column="14" selection-end-line="88" selection-end-column="14" />
+                  <folding>
+                    <element signature="e#0#31#0" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -171,10 +114,33 @@
           <file leaf-file-name="adversarial.py" pinned="false" current-in-tab="false">
             <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/foolbox/adversarial.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-352">
+                <state relative-caret-position="-712">
                   <caret line="304" column="8" selection-start-line="304" selection-start-column="8" selection-end-line="304" selection-end-column="8" />
                 </state>
               </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="deepfool.py" pinned="false" current-in-tab="false">
+            <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/foolbox/attacks/deepfool.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="207">
+                  <caret line="69" column="36" selection-start-line="69" selection-start-column="36" selection-end-line="69" selection-end-column="36" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="distances.py" pinned="false" current-in-tab="true">
+            <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/foolbox/distances.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="-748">
+                  <caret line="120" column="6" selection-start-line="120" selection-start-column="6" selection-end-line="120" selection-end-column="6" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="CNN_SVM1.pstat" pinned="false" current-in-tab="false">
+            <entry file="mock://C:\Users\Shadow\.PyCharm2018.1\system\snapshots\CNN_SVM1.pstat">
+              <provider selected="true" editor-type-id="profiler-session-editor" />
             </entry>
           </file>
         </leaf>
@@ -193,7 +159,9 @@
       <find>adv_img</find>
       <find>list</find>
       <find>read</find>
+      <find>steps</find>
       <find>v</find>
+      <find>extend</find>
     </findStrings>
     <replaceStrings>
       <replace>attack_rate</replace>
@@ -220,8 +188,8 @@
         <option value="$PROJECT_DIR$/generate_svm.py" />
         <option value="$PROJECT_DIR$/saved_models_new/Visualize_decision_boundary.py" />
         <option value="$PROJECT_DIR$/eval_adv_cross.py" />
-        <option value="$PROJECT_DIR$/generate_adv_utils.py" />
         <option value="$PROJECT_DIR$/Visualize_decision_boundary.py" />
+        <option value="$PROJECT_DIR$/generate_adv_utils.py" />
         <option value="$PROJECT_DIR$/FGSM.py" />
       </list>
     </option>
@@ -293,7 +261,26 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.Visualize_decision_boundary">
+  <component name="RunManager" selected="Python.FGSM">
+    <configuration name="FGSM" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="CNN_SVM" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/FGSM.py" />
+      <option name="PARAMETERS" value="test" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
     <configuration name="Visualize_decision_boundary" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="CNN_SVM" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -351,25 +338,6 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
-    <configuration name="generate_ensemble" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="CNN_SVM" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/generate_ensemble.py" />
-      <option name="PARAMETERS" value="ensemble_clip_2" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-    </configuration>
     <configuration name="generate_ensemble_new" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="CNN_SVM" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -411,18 +379,18 @@
     <list>
       <item itemvalue="Python.generate_adv_utils" />
       <item itemvalue="Python.eval_adv_cross" />
-      <item itemvalue="Python.generate_ensemble" />
       <item itemvalue="Python.generate_ensemble_new" />
       <item itemvalue="Python.generate_svm" />
       <item itemvalue="Python.Visualize_decision_boundary" />
+      <item itemvalue="Python.FGSM" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.FGSM" />
         <item itemvalue="Python.Visualize_decision_boundary" />
         <item itemvalue="Python.generate_svm" />
         <item itemvalue="Python.generate_ensemble_new" />
         <item itemvalue="Python.eval_adv_cross" />
-        <item itemvalue="Python.generate_ensemble" />
       </list>
     </recent_temporary>
   </component>
@@ -452,19 +420,20 @@
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5010941" side_tool="true" weight="0.45675105" />
+      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.50149703" side_tool="true" weight="0.393586" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="10" weight="0.3260188" />
-      <window_info anchor="bottom" id="Python Console" order="11" weight="0.32810867" />
+      <window_info anchor="bottom" id="Python Console" order="11" weight="0.32750243" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4989059" weight="0.33041787" />
-      <window_info anchor="bottom" id="Terminal" order="13" weight="0.32555878" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49854228" visible="true" weight="0.10429142" />
+      <window_info anchor="right" id="Coverage" side_tool="true" />
+      <window_info anchor="bottom" id="Terminal" order="13" sideWeight="0.499501" weight="0.32555878" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49854228" visible="true" weight="0.10528942" />
       <window_info anchor="bottom" id="Docker" order="12" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="4" />
       <window_info anchor="right" id="SciView" order="3" weight="0.47355288" />
       <window_info id="Structure" order="1" sideWeight="0.5009709" side_tool="true" weight="0.10429142" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Debug" order="3" visible="true" weight="0.393586" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.498503" visible="true" weight="0.393586" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -598,6 +567,11 @@
           <line>80</line>
           <option name="timeStamp" value="97" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/FGSM.py</url>
+          <line>229</line>
+          <option name="timeStamp" value="116" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -606,90 +580,76 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="100" />
+      <option name="time" value="117" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
-        <watch expression="label[i]" language="Python" />
-        <watch expression="keras.utils.to_categorical(orig_label, num_classes)" language="Python" />
-        <watch expression="np.ones(32, 32, 3)" language="Python" />
-        <watch expression="np.sqrt(np.sum(np.square(cur_grad)))" language="Python" />
-        <watch expression="step_grad * cur_grad" language="Python" />
-        <watch expression="step_grad * cur_grad" language="Python" />
-        <watch expression="temp_img - img" language="Python" />
-        <watch expression="np.argmax(result_list, axis=1)" language="Python" />
+        <watch expression="model_adv.predict(adv_list_ensemble[0]-mean)" language="Python" />
+        <watch expression="model_adv.predict(adv_list_ensemble[1]-mean)" language="Python" />
+        <watch expression="model_adv.predict(adv_list-mean)" language="Python" />
+        <watch expression="np.array(adv_list).shape" language="Python" />
+        <watch expression="model_adv.predict(adv_list_ensemble[1]-mean)" language="Python" />
+        <watch expression="Adversarial.root_mean_square_deviation(image, np.array(adv_list))" language="Python" />
+        <watch expression="Adversarial.root_mean_square_deviation(image, np.array(adv_list_ensemble))" language="Python" />
+        <watch expression="model_adv.predict(adv_image-mean)" language="Python" />
       </configuration>
     </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="watch">
       <expression>
-        <expression-string>np.argmax(result_list, axis=1)</expression-string>
+        <expression-string>np.array(adv_list).shape</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>np.argmax(result_list, axis=0)</expression-string>
+        <expression-string>adv_list.shape</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>temp_img - img</expression-string>
+        <expression-string>model_adv.predict(adv_list-mean)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>temp_img = img + step_grad * cur_grad</expression-string>
+        <expression-string>model_adv.predict(adv_list_ensemble[0]-mean)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>temp_img = img + step_grad * cur_grad + step_unit * unit_vec - mean</expression-string>
+        <expression-string>model_adv.predict(adv_list_ensemble[1]-mean)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>step_grad * cur_grad</expression-string>
+        <expression-string>model_adv.predict(adv_list[0]-mean)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>np.sqrt(np.sum(np.square(cur_grad)))</expression-string>
+        <expression-string>Adversarial.root_mean_square_deviation(image, np.array(adv_list_ensemble))</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>np.sqrt(np.sum(np.square(cur_grad))</expression-string>
+        <expression-string>Adversarial.root_mean_square_deviation(image, np.array(adv_list))</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>cur_grad / np.sqrt(np.sum(np.square(cur_grad)))</expression-string>
+        <expression-string>model_adv.predict(np.array(adv_list_ensemble)-mean)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>cur_grad / np.sqrt(np.sum(np.square(cur_grad))))</expression-string>
+        <expression-string>model_adv.predict(adv_list_ensemble-mean)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="20273">
-          <caret line="1067" selection-start-line="1067" selection-end-line="1067" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/codecs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6061">
-          <caret line="319" selection-start-line="319" selection-end-line="319" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/eval_model.py" />
     <entry file="file://$PROJECT_DIR$/eval_adv.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -912,16 +872,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/generate_ensemble_new.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1568">
-          <caret line="104" column="24" selection-start-line="104" selection-start-column="24" selection-end-line="104" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#37#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/generate_svm.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="19">
@@ -929,24 +879,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/foolbox/adversarial.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-352">
-          <caret line="304" column="8" selection-start-line="304" selection-start-column="8" selection-end-line="304" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/keras/backend/tensorflow_backend.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="199">
           <caret line="3041" selection-start-line="3041" selection-end-line="3041" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/foolbox/models/keras.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-835">
-          <caret line="51" column="8" selection-start-line="51" selection-start-column="8" selection-end-line="51" selection-end-column="8" />
         </state>
       </provider>
     </entry>
@@ -964,16 +900,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/generate_ensemble.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="688">
-          <caret line="78" selection-start-line="78" selection-end-line="78" />
-          <folding>
-            <element signature="e#0#37#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/keras/engine/training.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="247">
@@ -988,13 +914,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/generate_adv_utils.py">
+    <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/foolbox/models/keras.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1738">
-          <caret line="171" column="49" selection-start-line="171" selection-start-column="49" selection-end-line="171" selection-end-column="49" />
+        <state relative-caret-position="-698">
+          <caret line="64" column="16" selection-start-line="64" selection-start-column="16" selection-end-line="64" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/foolbox/attacks/gradientsign.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1461">
+          <caret line="88" column="14" selection-start-line="88" selection-start-column="14" selection-end-line="88" selection-end-column="14" />
           <folding>
-            <element signature="e#0#15#0" expanded="true" />
+            <element signature="e#0#31#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/foolbox/adversarial.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-712">
+          <caret line="304" column="8" selection-start-line="304" selection-start-column="8" selection-end-line="304" selection-end-column="8" />
         </state>
       </provider>
     </entry>
@@ -1008,30 +948,67 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/generate_ensemble.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="688">
+          <caret line="78" selection-start-line="78" selection-end-line="78" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/foolbox/attacks/deepfool.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="207">
+          <caret line="69" column="36" selection-start-line="69" selection-start-column="36" selection-end-line="69" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/foolbox/distances.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-748">
+          <caret line="120" column="6" selection-start-line="120" selection-start-column="6" selection-end-line="120" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Visualize_decision_boundary.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="57">
-          <caret line="8" selection-start-line="8" selection-end-line="31" selection-end-column="71" />
+        <state relative-caret-position="-473">
+          <caret line="39" selection-start-line="39" selection-end-line="39" selection-end-column="41" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/generate_ensemble_new.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1653">
+          <caret line="15" column="30" selection-start-line="15" selection-start-column="30" selection-end-line="15" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/generate_adv_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="303">
+          <caret line="262" column="30" selection-start-line="262" selection-start-column="24" selection-end-line="262" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/FGSM.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="61">
-          <caret line="7" column="54" selection-start-line="7" selection-start-column="54" selection-end-line="7" selection-end-column="54" />
+        <state relative-caret-position="287">
+          <caret line="206" column="44" lean-forward="true" selection-start-line="206" selection-start-column="44" selection-end-line="206" selection-end-column="44" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Miniconda3/envs/tf/Lib/site-packages/foolbox/attacks/gradientsign.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-604">
-          <caret line="88" column="9" selection-start-line="88" selection-start-column="9" selection-end-line="88" selection-end-column="9" />
         </state>
       </provider>
     </entry>
