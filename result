@@ -1,0 +1,3 @@
+cifar10_ResNet20v3_model.{epoch:03d}.L1_0.0501.L2_0.h5
+Test loss:0.4480914041042328
+Test accuracy:0.9236
