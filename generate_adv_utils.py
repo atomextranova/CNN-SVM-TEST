@@ -159,8 +159,8 @@ def attack_group_1(model_adv, model_name, save_dir, lock, gap):
     # attack_LBFGSAttack = foolbox.attacks.LBFGSAttack(model_adv)
     # attack_wrapper(save_dir, model_name, attack_LBFGSAttack, 'LBGFS', gap, lock)
 
-    attack_GaussianBlur = foolbox.attacks.GaussianBlurAttack(model_adv)
-    attack_wrapper(save_dir, model_name, attack_GaussianBlur, "Gaussian_Blur", gap, lock)
+    # attack_GaussianBlur = foolbox.attacks.GaussianBlurAttack(model_adv)
+    # attack_wrapper(save_dir, model_name, attack_GaussianBlur, "Gaussian_Blur", gap, lock)
 
     # attack_IterGrad = foolbox.attacks.IterativeGradientAttack(model_adv)
     # attack_wrapper(save_dir, model_name, attack_IterGrad, "Iter_Grad", gap, lock)
@@ -200,7 +200,8 @@ def attack_worker(arg_list):
     model_adv = foolbox.models.KerasModel(model, bounds=(-1, 1), preprocessing=((0, 0, 0), 1))
 
     # thread_list = []
-    attack_group_1(model_adv, save_dir, model_name, threading.Lock(), gap)
+    my_args_dict = ()
+    attack_group_1(model_adv,model_name, save_dir, threading.Lock(), gap)
     # attack_group(model_adv, process_size, model_name, save_dir, threading.Lock(), gap)
     # attack_group_1(model_adv, model_name, save_dir, threading.Lock(), gap)  # Debug line
     # thread_list.append(threading.Thread(target=attack_group_1, kwargs=my_args_dict))
