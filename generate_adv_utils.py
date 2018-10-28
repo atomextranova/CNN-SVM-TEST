@@ -200,8 +200,7 @@ def attack_worker(arg_list):
     model_adv = foolbox.models.KerasModel(model, bounds=(-1, 1), preprocessing=((0, 0, 0), 1))
 
     # thread_list = []
-    my_args_dict = dict(model_adv=model_adv, save_dir=save_dir, model_name=model_name, lock=threading.Lock(), gap=gap)
-    attack_group_1(my_args_dict)
+    attack_group_1(model_adv, save_dir, model_name, threading.Lock(), gap)
     # attack_group(model_adv, process_size, model_name, save_dir, threading.Lock(), gap)
     # attack_group_1(model_adv, model_name, save_dir, threading.Lock(), gap)  # Debug line
     # thread_list.append(threading.Thread(target=attack_group_1, kwargs=my_args_dict))
@@ -216,7 +215,7 @@ def attack_worker(arg_list):
 
 def attack(save_dir, process_size, model_names, model_dirs, gap):
     generate_orig()
-    attacker_pool = multiprocessing.Pool(processes=process_size)
+    attacker_pool = multiprocessing.Pool()
     args_list = [[save_dir, process_size, model_name, model_dir, gap] for model_name, model_dir in list(zip(model_names, model_dirs))]
     attacker_pool.map(attack_worker, args_list)
     # for model_name, model_dir in list(zip(model_names, model_dirs)):
