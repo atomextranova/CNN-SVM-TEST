@@ -215,7 +215,7 @@ def attack_worker(arg_list):
 
 def attack(save_dir, process_size, model_names, model_dirs, gap):
     generate_orig()
-    attacker_pool = multiprocessing.Pool()
+    attacker_pool = multiprocessing.Pool(1)
     args_list = [[save_dir, process_size, model_name, model_dir, gap] for model_name, model_dir in list(zip(model_names, model_dirs))]
     attacker_pool.map(attack_worker, args_list)
     # for model_name, model_dir in list(zip(model_names, model_dirs)):
