@@ -19,7 +19,7 @@ import sys
 
 data_augmentation = True
 batch_size = 32
-epochs = 150
+epochs = 100
 depth = 20
 version = 3
 num_classes = 10
@@ -124,7 +124,7 @@ def generate_model(l1, l2, type=None):
     print(model_type)
 
     # Prepare model model saving directory.
-    save_dir = os.path.join(os.getcwd(), 'saved_models_new')
+    save_dir = os.path.join(os.getcwd(), 'saved_models_final')
     model_name = 'cifar10_%s_model.{epoch:03d}.L1_%s.L2_%s.h5' % (model_type, str(l1), str(l2))
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
@@ -206,10 +206,10 @@ def generate_model(l1, l2, type=None):
 file = open("result", "w")
 # regulization
 # = [0.25, 0.3, 0.35, 0.4, 0.15]
-l1_list = [0.0501]
+l1_list = [0]
 l2_list = [0]
 for reg_l1 in l1_list:
-    for reg_l2 in l2_list:
+    for reg_l2 in range(1, 30):
         generate_model(reg_l1, reg_l2)
 
 
