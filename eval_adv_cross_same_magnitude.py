@@ -225,7 +225,7 @@ if __name__ == '__main__':
     for j, name in enumerate(model_list_adv):
         for adv_method in adv_list:
             adv_img = read_adv_img(name, adv_method)
-            avg_val = np.sum(np.abs(adv_img - image)) / adv_img.size * 255
+            avg_val = np.sum(np.abs(adv_img - img)) / adv_img.size * 255
             avg_val_max = max(avg_val, avg_val_max)
     print(avg_val_max)
 
@@ -285,4 +285,4 @@ if __name__ == '__main__':
         report = "{}: average accuracy: {} with variance: {}\n".format(key, avg, std)
         print(report)
         txt_record.write(report)
-    file.save("report-final-10-28-2.xls")
+    file.save("report-final-10-28-3.xls")
