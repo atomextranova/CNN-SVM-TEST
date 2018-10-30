@@ -104,7 +104,7 @@ def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name):
 
 
 def read_orig():
-    with  h5py.File('attack/orig.h5') as hf:
+    with  h5py.File('orig.h5') as hf:
         # value = list(hf.values())
         # print(value)
         return hf['orig'][:], hf['pred'][:], hf['label'][:]
@@ -159,7 +159,7 @@ if __name__ == '__main__':
                   and file.startswith('cifar')
                   and file.endswith('.h5')]
     model_list_adv_cifar = [os.path.join(adv_file_dir, file) for file in adv_file_name_cifar]
-    model_list_adv.extend(model_list_adv_cifar)
+    # model_list_adv.extend(model_list_adv_cifar)
 
     worksheet_name = list(map(condition, file_name))
     worksheet_name.extend(list(map(condition, adv_file_name)))
