@@ -227,7 +227,7 @@ if __name__ == '__main__':
     adv_result_cross_dict = {key: [] for key in adv_list}
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
-    for i, model_name in enumerate(model_list):
+    for i, model_name in enumerate(sorted(model_list)):
         model_file = xlwt.Workbook(encoding = "utf-8")
         table = model_file.add_sheet('result')
         model = keras.models.load_model(model_name + ".h5")
@@ -242,7 +242,7 @@ if __name__ == '__main__':
         # table = model_file.add_sheet(worksheet_name[i])
         for l, adv_name in enumerate(adv_list):
             table.write(0, l+1, adv_name)
-        for j, name in enumerate(model_list_adv):
+        for j, name in enumerate(sorted(model_list_adv)):
             print("Using image from model: %s\n" % name)
             # if name == "attack/cifar10_ResNet20v1_model.194":
             if 'cifar10_ResNet20v1_model.194' in name:
