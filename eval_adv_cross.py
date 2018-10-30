@@ -137,10 +137,10 @@ def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name):
 
 
 def read_orig():
-    with  h5py.File('orig.h5') as hf:
+    with  h5py.File('attack/orig.h5') as hf:
         # value = list(hf.values())
         # print(value)
-        return hf['image'][:], hf['label'][:], hf['mean'][:]
+        return hf['orig'][:], hf['pred'][:], hf['label'][:]
 
 
 def read_adv_img(model, adv):
