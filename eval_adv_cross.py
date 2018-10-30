@@ -40,6 +40,39 @@ print(x_train.shape[0], 'train samples')
 print(x_test.shape[0], 'test samples')
 print('y_train shape:', y_train.shape)
 
+def generate_orig():
+    if not os.path.exists('orig.h5'):
+        subtract_pixel_mean = True
+
+        # Load the CIFAR10 data.
+        (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
+
+        # Normalize data.
+        x_train = x_train.astype('float32') / 255
+        x_test = x_test.astype('float32') / 255
+
+        # If subtract pixel mean is enabled
+        x_train_mean = np.mean(x_train, axis=0)
+        if subtract_pixel_mean:
+            x_train -= x_train_mean
+            x_test -= x_train_mean
+
+        def array_to_scalar(arr):
+            list = []
+            for item in arr:
+                list.append(np.asscalar(item))
+            return np.array(list)
+
+        # Convert class vectors to binary class matrices.
+        y_train = array_to_scalar(y_train)
+        y_test = array_to_scalar(y_test)
+
+        # Save data
+        with h5py.File("orig.h5", "w") as hf:
+            hf.create_dataset(name='image', data=x_test)
+            hf.create_dataset(name='label', data=y_test)
+            hf.create_dataset(name='mean', data=x_train_mean)
+
 
 # def eval_adv(model, name, mean, image, pred, label):
 def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name):
@@ -107,7 +140,7 @@ def read_orig():
     with  h5py.File('orig.h5') as hf:
         # value = list(hf.values())
         # print(value)
-        return hf['orig'][:], hf['pred'][:], hf['label'][:]
+        return hf['image'][:], hf['label'][:], hf['mean'][:]
 
 
 def read_adv_img(model, adv):
@@ -127,15 +160,16 @@ def condition(worksheet_name):
 
 if __name__ == '__main__':
     txt_record = open("evaluation_results.txt", 'w')
-    image, _, label = read_orig()
+    generate_orig()
+    image, label, mean = read_orig()
     label_ex = keras.utils.to_categorical(label, 10)
 
     img = image[::10]
     label = label[::10]
 
-    # label = label[::10]
-    with h5py.File("attack/mean.h5", "r") as hf:
-        mean = hf['mean'][:]
+    # # label = label[::10]
+    # with h5py.File("mean.h5", "r") as hf:
+    #     mean = hf['mean'][:]
 
     file_dir = sys.argv[1]
     file_name = [os.path.splitext(file)[0] for file in os.listdir(file_dir) if os.path.isfile(os.path.join(file_dir, file))
@@ -240,4 +274,4 @@ if __name__ == '__main__':
         report = "{}: average accuracy: {} with variance: {}\n".format(key, avg, std)
         print(report)
         txt_record.write(report)
-    file.save("report-final-10-28-1.xls")
+    file.save("report-final-10-28-2.xls")
