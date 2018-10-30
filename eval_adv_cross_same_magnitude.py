@@ -233,7 +233,7 @@ if __name__ == '__main__':
     print(avg_val_max)
 
     file = xlwt.Workbook(encoding="utf-8")
-    save_dir = 'evaluation_result'
+    save_dir = 'evaluation_result_same'
     # file_real_number = xlwt.Workbook(encoding = "utf-8")
     accuracy = file.add_sheet("Accuracy base line")
     accuracy.write(0, 1, "Loss")
