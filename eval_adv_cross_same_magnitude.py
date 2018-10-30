@@ -175,7 +175,7 @@ if __name__ == '__main__':
 
     file_dir = sys.argv[1]
     file_name = [os.path.splitext(file)[0] for file in os.listdir(file_dir) if os.path.isfile(os.path.join(file_dir, file))
-                  and file.startswith('cifar')
+                  and file.startswith('cifar') and 'svm' not in file
                   and file.endswith('.h5')]
 
     adv_file_dir = sys.argv[2]
@@ -230,13 +230,18 @@ if __name__ == '__main__':
     print(avg_val_max)
 
     file = xlwt.Workbook(encoding = "utf-8")
+    save_dir = 'evaluation_result'
     # file_real_number = xlwt.Workbook(encoding = "utf-8")
     accuracy = file.add_sheet("Accuracy base line")
     accuracy.write(0, 1, "Loss")
     accuracy.write(0, 2, "Accuracy")
     adv_result_dict = {key: [] for key in adv_list}
     adv_result_cross_dict = {key: [] for key in adv_list}
+    if not os.path.isdir(save_dir):
+        os.makedirs(save_dir)
     for i, model_name in enumerate(model_list):
+        model_file = xlwt.Workbook(encoding = "utf-8")
+        table = model_file.add_sheet('result')
         model = keras.models.load_model(model_name + ".h5")
         pred = model.predict(x_test[::10])
         print("--- Evaluation: %s, started ---\n" % (model_name))
@@ -246,7 +251,7 @@ if __name__ == '__main__':
         accuracy.write(i + 1, 0, model_name)
         accuracy.write(i + 1, 1, loss)
         accuracy.write(i + 1, 2, acc)
-        table = file.add_sheet(worksheet_name[i])
+        # table = model_file.add_sheet(worksheet_name[i])
         for l, adv_name in enumerate(adv_list):
             table.write(0, l+1, adv_name)
         for j, name in enumerate(model_list_adv):
@@ -266,6 +271,8 @@ if __name__ == '__main__':
             table.write(j+1, 0, name)
             for k, rate in enumerate(efficiency):
                 table.write(j+1, k+1, rate)
+        model_file.save(os.path.join(save_dir, model_name.split('/')[1] + '.xls'))
+    file.save(os.path.join(save_dir, 'Accuracy_baseline.xls'))
 
 
     txt_record.write("Cross results\n")
@@ -285,4 +292,3 @@ if __name__ == '__main__':
         report = "{}: average accuracy: {} with variance: {}\n".format(key, avg, std)
         print(report)
         txt_record.write(report)
-    file.save("report-final-10-28-3.xls")
