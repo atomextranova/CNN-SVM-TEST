@@ -112,10 +112,10 @@ def read_orig():
 
 def read_adv_img(model, adv):
     if model == "":
-        with h5py.File(file_dir+"/adv_" + adv + "_" + "gap.h5", 'r') as hf:
+        with h5py.File(adv_file_dir+"/adv_" + adv + "_" + "gap.h5", 'r') as hf:
             return hf['adv'][:]
     else:
-        with h5py.File(file_dir+"/adv_" + adv + "_" + model.split("\\")[1] + "_gap.h5", 'r') as hf:
+        with h5py.File(adv_file_dir+"/adv_" + adv + "_" + model.split("\\")[1] + "_gap.h5", 'r') as hf:
             return hf['adv'][:]
 
 def condition(worksheet_name):
@@ -141,15 +141,28 @@ if __name__ == '__main__':
     file_name = [os.path.splitext(file)[0] for file in os.listdir(file_dir) if os.path.isfile(os.path.join(file_dir, file))
                   and file.startswith('cifar')
                   and file.endswith('.h5')]
+
+    adv_file_dir = sys.argv[2]
+    adv_file_name = [os.path.splitext(file)[0] for file in os.listdir(adv_file_dir) if os.path.isfile(os.path.join(adv_file_dir, file))
+                  and file.startswith('ens')
+                  and file.endswith('.h5')]
     # xlwt requires less than 31
     # worksheet_name = [name for name in worksheet_name if len(name) < 30]
 
 
     model_list = [os.path.join(file_dir, file) for file in file_name]
-    model_list.append('clip_ensemble\\ensemble')
-    model_list_adv = ['clip_ensemble\\ensemble']
+    model_list_adv = [os.path.join(adv_file_dir, file) for file in adv_file_name]
+    model_list.extend(model_list_adv)
+
+
+    adv_file_name_cifar = [os.path.splitext(file)[0] for file in os.listdir(adv_file_dir) if os.path.isfile(os.path.join(adv_file_dir, file))
+                  and file.startswith('cifar')
+                  and file.endswith('.h5')]
+    model_list_adv_cifar = [os.path.join(adv_file_dir, file) for file in adv_file_name_cifar]
+    model_list_adv.extend(model_list_adv_cifar)
+
     worksheet_name = list(map(condition, file_name))
-    worksheet_name.append('ensemble')
+    worksheet_name.extend(list(map(condition, adv_file_name)))
 
     # for i, item in enumerate(model_list):
     #     model_list[i] = "attack/"+item
@@ -163,8 +176,8 @@ if __name__ == '__main__':
     # adv_list = ['DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
     #             'Local_search', 'Single_Pixel', 'DeepFool_L_INF', 'Gaussian_Blur']
 
-    adv_list = ['DeepFool_L_2',
-            'DeepFool_L_INF', 'Gaussian_Blur',  'Iter_Grad']
+    adv_list = ['DeepFool_L_2','DeepFool_L_INF']
+            # ,'DeepFool_L_INF', 'Gaussian_Blur',  'Iter_Grad']
 
     # adv_list = ['DeepFool_L_2',
     #         'DeepFool_L_INF']
@@ -227,4 +240,4 @@ if __name__ == '__main__':
         report = "{}: average accuracy: {} with variance: {}\n".format(key, avg, std)
         print(report)
         txt_record.write(report)
-    file.save("report-final-6-14-2-1.xls")
+    file.save("report-final-10-28-1.xls")

@@ -7,21 +7,21 @@ import xlwt
 import sys
 import argparse
 
-# Load the CIFAR10 data.
-(x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
-
-# Input image dimensions.
-input_shape = x_train.shape[1:]
-
-# Normalize data.
-x_train = x_train.astype('float32') / 255
-x_test = x_test.astype('float32') / 255
-
-# If subtract pixel mean is enabled
-x_train_mean = np.mean(x_train, axis=0)
-
-x_train -= x_train_mean
-x_test -= x_train_mean
+# # Load the CIFAR10 data.
+# (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
+#
+# # Input image dimensions.
+# input_shape = x_train.shape[1:]
+#
+# # Normalize data.
+# x_train = x_train.astype('float32') / 255
+# x_test = x_test.astype('float32') / 255
+#
+# # If subtract pixel mean is enabled
+# x_train_mean = np.mean(x_train, axis=0)
+#
+# x_train -= x_train_mean
+# x_test -= x_train_mean
 
 
 
@@ -32,14 +32,14 @@ def array_to_scalar(arr):
     return np.array(list)
 
 
-# Convert class vectors to binary class matrices.
-y_train = array_to_scalar(y_train)
-y_test = array_to_scalar(y_test)
-
-print('x_train shape:', x_train.shape)
-print(x_train.shape[0], 'train samples')
-print(x_test.shape[0], 'test samples')
-print('y_train shape:', y_train.shape)
+# # Convert class vectors to binary class matrices.
+# y_train = array_to_scalar(y_train)
+# y_test = array_to_scalar(y_test)
+#
+# print('x_train shape:', x_train.shape)
+# print(x_train.shape[0], 'train samples')
+# print(x_test.shape[0], 'test samples')
+# print('y_train shape:', y_train.shape)
 
 
 # def eval_adv(model, name, mean, image, pred, label):
@@ -95,7 +95,7 @@ def generate_orig():
         subtract_pixel_mean = True
 
         # Load the CIFAR10 data.
-        (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+        (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
 
         # Normalize data.
         x_train = x_train.astype('float32') / 255
@@ -172,8 +172,8 @@ if __name__ == '__main__':
     # adv_list = ['DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
     #             'Local_search', 'Single_Pixel', 'DeepFool_L_INF', 'Gaussian_Blur']
 
-    adv_list = ['DeepFool_L_2',
-            'DeepFool_L_INF', 'Gaussian_Blur',  'Iter_Grad', 'LBGFS', 'Iter_GradSign']
+    adv_list = ['DeepFool_L_2']
+            # ,'DeepFool_L_INF', 'Gaussian_Blur',  'Iter_Grad', 'LBGFS', 'Iter_GradSign']
 
     file = xlwt.Workbook(encoding="utf-8")
     # file_real_number = xlwt.Workbook(encoding = "utf-8")
@@ -194,40 +194,40 @@ if __name__ == '__main__':
         table = file.add_sheet(worksheet_name[i])
         for l, adv_name in enumerate(adv_list):
             table.write(0, l+1, adv_name)
-    #     for j, name in enumerate(model_list_adv):
-    #         print("Using image from model: %s\n" % name)
-    #         # if name == "attack/cifar10_ResNet20v1_model.194":
-    #         if 'cifar10_ResNet20v1_model.194' in name:
-    #             name = ""
-    #         efficiency = []
-    #         for adv_method in adv_list:
-    #             adv_img = read_adv_img(name, adv_method)
-    #             among_adv, among_all = eval_adv(model, img, adv_img, pred, label, name, adv_method)
-    #             efficiency.append(among_adv/among_all)
-    #             if model_name == name:
-    #                 adv_result_dict[adv_method].append(among_adv/among_all)
-    #             else:
-    #                 adv_result_cross_dict[adv_method].append(among_adv/among_all)
-    #         table.write(j+1, 0, name)
-    #         for k, rate in enumerate(efficiency):
-    #             table.write(j+1, k+1, rate)
-    #
-    #
-    # txt_record.write("Cross results\n")
-    # for key, rate in adv_result_cross_dict.items():
-    #     attack_rate = np.array(rate)
-    #     avg = np.average(attack_rate)
-    #     std = np.std(attack_rate)
-    #     report = "{}: average accuracy: {} with variance: {}\n".format(key, avg, std)
-    #     print(report)
-    #     txt_record.write(report)
-    #
-    # txt_record.write("Target results\n")
-    # for key, rate in adv_result_dict.items():
-    #     attack_rate = np.array(rate)
-    #     avg = np.average(attack_rate)
-    #     std = np.std(attack_rate)
-    #     report = "{}: average accuracy: {} with variance: {}\n".format(key, avg, std)
-    #     print(report)
-    #     txt_record.write(report)
+        for j, name in enumerate(model_list_adv):
+            print("Using image from model: %s\n" % name)
+            # if name == "attack/cifar10_ResNet20v1_model.194":
+            if 'cifar10_ResNet20v1_model.194' in name:
+                name = ""
+            efficiency = []
+            for adv_method in adv_list:
+                adv_img = read_adv_img(name, adv_method)
+                among_adv, among_all = eval_adv(model, img, adv_img, pred, label, name, adv_method)
+                efficiency.append(among_adv/among_all)
+                if model_name == name:
+                    adv_result_dict[adv_method].append(among_adv/among_all)
+                else:
+                    adv_result_cross_dict[adv_method].append(among_adv/among_all)
+            table.write(j+1, 0, name)
+            for k, rate in enumerate(efficiency):
+                table.write(j+1, k+1, rate)
+
+
+    txt_record.write("Cross results\n")
+    for key, rate in adv_result_cross_dict.items():
+        attack_rate = np.array(rate)
+        avg = np.average(attack_rate)
+        std = np.std(attack_rate)
+        report = "{}: average accuracy: {} with variance: {}\n".format(key, avg, std)
+        print(report)
+        txt_record.write(report)
+
+    txt_record.write("Target results\n")
+    for key, rate in adv_result_dict.items():
+        attack_rate = np.array(rate)
+        avg = np.average(attack_rate)
+        std = np.std(attack_rate)
+        report = "{}: average accuracy: {} with variance: {}\n".format(key, avg, std)
+        print(report)
+        txt_record.write(report)
     # file.save("report-final-6-14-2-1.xls")

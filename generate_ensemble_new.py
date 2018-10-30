@@ -72,6 +72,7 @@ def evaluate_model(save_dir, ensemble_model, model_name, orig_image, orig_label,
 
 def generate_resnet_ensemble_batch(model_locs, save_dir, image_shape, orig_image, orig_label, mean_of_image=(0, 0, 0),
                                    nums=(2, 3)):
+
     orig_label = keras.utils.to_categorical(orig_label, 10)
     input_layer = Input(image_shape)
     model_list = []
@@ -89,15 +90,25 @@ def generate_resnet_ensemble_batch(model_locs, save_dir, image_shape, orig_image
     for model in model_list:
         print(model.name)
 
-
-    for ensemble_num in nums:
-        print('Start generating ensembles of length {}'.format(ensemble_num))
-        for i, subset in enumerate(itertools.combinations(model_list, ensemble_num)):
-            model_name = 'ensemble_of_{}_{}'.format(ensemble_num, i)
-            ensemble_model = generate_resnet_ensemble(subset, save_dir, input_layer, model_name)
-            ensemble_dir = os.path.join(save_dir, '{}.h5'.format(model_name))
-            ensemble_model.save(ensemble_dir)
-            evaluate_model(save_dir, ensemble_model, model_name, orig_image, orig_label, mean_of_image)
+    if part:
+        for ensemble_num in range(2, 19):
+            print('Start generating ensembles of length {}'.format(ensemble_num))
+            for i, subset in enumerate(itertools.combinations(model_list, ensemble_num)):
+                model_name = 'ensemble_of_{}_{}'.format(ensemble_num, i)
+                ensemble_model = generate_resnet_ensemble(subset, save_dir, input_layer, model_name)
+                ensemble_dir = os.path.join(save_dir, '{}.h5'.format(model_name))
+                ensemble_model.save(ensemble_dir)
+                evaluate_model(save_dir, ensemble_model, model_name, orig_image, orig_label, mean_of_image)
+                break
+    else:
+        for ensemble_num in nums:
+            print('Start generating ensembles of length {}'.format(ensemble_num))
+            for i, subset in enumerate(itertools.combinations(model_list, ensemble_num)):
+                model_name = 'ensemble_of_{}_{}'.format(ensemble_num, i)
+                ensemble_model = generate_resnet_ensemble(subset, save_dir, input_layer, model_name)
+                ensemble_dir = os.path.join(save_dir, '{}.h5'.format(model_name))
+                ensemble_model.save(ensemble_dir)
+                evaluate_model(save_dir, ensemble_model, model_name, orig_image, orig_label, mean_of_image)
 
 
 def generate_orig():
@@ -149,6 +160,7 @@ if __name__ == "__main__":
                         help="specify all models or model directories that is to be attacked")
     parser.add_argument('-s', '--save_dir', help="specify the save directory for attack file", default=None)
     parser.add_argument('-g', '--gap', help='select images with gap ([::10])', type=int, default=1)
+    parser.add_argument('-p', '--part', help='Generate all possible ensembles or 1 for each length', type=bool, default=False)
     args = parser.parse_args()
 
     model_locs = args.model
@@ -160,6 +172,7 @@ if __name__ == "__main__":
             save_dir = model_locs
     else:
         save_dir = args.save_dir
+    part = args.part
     gap = args.gap
     generate_orig()
     orig_image, orig_label, mean_of_image = read_orig(gap)
