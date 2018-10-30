@@ -23,7 +23,6 @@ x_train -= x_train_mean
 x_test -= x_train_mean
 
 
-
 def array_to_scalar(arr):
     list = []
     for item in arr:
@@ -39,6 +38,7 @@ print('x_train shape:', x_train.shape)
 print(x_train.shape[0], 'train samples')
 print(x_test.shape[0], 'test samples')
 print('y_train shape:', y_train.shape)
+
 
 def generate_orig():
     if not os.path.exists('orig.h5'):
@@ -79,7 +79,7 @@ def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name, avg_
     attack = 0
     avg_val = np.sum(np.abs(adv_img - image)) / adv_img.size * 255
     factor = avg_val_max / avg_val
-    noise = (adv_img-image) * factor
+    noise = (adv_img - image) * factor
     adv_label = model.predict(image + noise - mean)
     total = 1000
     for i in range(adv_label.shape[0]):
@@ -91,8 +91,9 @@ def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name, avg_
     avg_var = np.var(np.abs(noise) * 255)
     print("Total for %s attack: %d, Success: %d, rate: %6.4f" % (
         adv_name, total, attack, attack / total))
-    print("Max value change: %10.8f, Min value change %10.8f, Avg value per pixel per channel: %10.8f with variance %10.8f\n" % (
-        max_val, min_val, avg_val, avg_var))
+    print(
+        "Max value change: %10.8f, Min value change %10.8f, Avg value per pixel per channel: %10.8f with variance %10.8f\n" % (
+            max_val, min_val, avg_val, avg_var))
     return attack, total
 
 
@@ -148,11 +149,12 @@ def read_orig():
 
 def read_adv_img(model, adv):
     if model == "":
-        with h5py.File(adv_file_dir+"/adv_" + adv + "_" + "gap.h5", 'r') as hf:
+        with h5py.File(adv_file_dir + "/adv_" + adv + "_" + "gap.h5", 'r') as hf:
             return hf['adv'][:]
     else:
-        with h5py.File(adv_file_dir+"/adv_" + adv + "_" + model.split("/")[1] + "_gap.h5", 'r') as hf:
+        with h5py.File(adv_file_dir + "/adv_" + adv + "_" + model.split("/")[1] + "_gap.h5", 'r') as hf:
             return hf['adv'][:]
+
 
 def condition(worksheet_name):
     if len(worksheet_name) >= 30:
@@ -174,26 +176,27 @@ if __name__ == '__main__':
         mean = hf['mean'][:]
 
     file_dir = sys.argv[1]
-    file_name = [os.path.splitext(file)[0] for file in os.listdir(file_dir) if os.path.isfile(os.path.join(file_dir, file))
-                  and file.startswith('cifar') and 'svm' not in file
-                  and file.endswith('.h5')]
+    file_name = [os.path.splitext(file)[0] for file in os.listdir(file_dir) if
+                 os.path.isfile(os.path.join(file_dir, file))
+                 and file.startswith('cifar') and 'svm' not in file
+                 and file.endswith('.h5')]
 
     adv_file_dir = sys.argv[2]
-    adv_file_name = [os.path.splitext(file)[0] for file in os.listdir(adv_file_dir) if os.path.isfile(os.path.join(adv_file_dir, file))
-                  and file.startswith('ens')
-                  and file.endswith('.h5')]
+    adv_file_name = [os.path.splitext(file)[0] for file in os.listdir(adv_file_dir) if
+                     os.path.isfile(os.path.join(adv_file_dir, file))
+                     and file.startswith('ens')
+                     and file.endswith('.h5')]
     # xlwt requires less than 31
     # worksheet_name = [name for name in worksheet_name if len(name) < 30]
-
 
     model_list = [os.path.join(file_dir, file) for file in file_name]
     model_list_adv = [os.path.join(adv_file_dir, file) for file in adv_file_name]
     model_list.extend(model_list_adv)
 
-
-    adv_file_name_cifar = [os.path.splitext(file)[0] for file in os.listdir(adv_file_dir) if os.path.isfile(os.path.join(adv_file_dir, file))
-                  and file.startswith('cifar')
-                  and file.endswith('.h5')]
+    adv_file_name_cifar = [os.path.splitext(file)[0] for file in os.listdir(adv_file_dir) if
+                           os.path.isfile(os.path.join(adv_file_dir, file))
+                           and file.startswith('cifar')
+                           and file.endswith('.h5')]
     model_list_adv_cifar = [os.path.join(adv_file_dir, file) for file in adv_file_name_cifar]
     # model_list_adv.extend(model_list_adv_cifar)
 
@@ -212,8 +215,8 @@ if __name__ == '__main__':
     # adv_list = ['DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
     #             'Local_search', 'Single_Pixel', 'DeepFool_L_INF', 'Gaussian_Blur']
 
-    adv_list = ['DeepFool_L_2','DeepFool_L_INF']
-            # ,'DeepFool_L_INF', 'Gaussian_Blur',  'Iter_Grad']
+    adv_list = ['DeepFool_L_2', 'DeepFool_L_INF']
+    # ,'DeepFool_L_INF', 'Gaussian_Blur',  'Iter_Grad']
 
     # adv_list = ['DeepFool_L_2',
     #         'DeepFool_L_INF']
@@ -229,7 +232,7 @@ if __name__ == '__main__':
             avg_val_max = max(avg_val, avg_val_max)
     print(avg_val_max)
 
-    file = xlwt.Workbook(encoding = "utf-8")
+    file = xlwt.Workbook(encoding="utf-8")
     save_dir = 'evaluation_result'
     # file_real_number = xlwt.Workbook(encoding = "utf-8")
     accuracy = file.add_sheet("Accuracy base line")
@@ -239,13 +242,15 @@ if __name__ == '__main__':
     adv_result_cross_dict = {key: [] for key in adv_list}
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
+    if not os.path.isdir(os.path.join(save_dir, adv_file_dir)):
+        os.makedirs(os.path.join(save_dir, adv_file_dir))
     for i, model_name in enumerate(sorted(model_list)):
-        model_file = xlwt.Workbook(encoding = "utf-8")
+        model_file = xlwt.Workbook(encoding="utf-8")
         table = model_file.add_sheet('result')
         model = keras.models.load_model(model_name + ".h5")
         pred = model.predict(x_test[::10])
         print("--- Evaluation: %s, started ---\n" % (model_name))
-        loss, acc = model.evaluate(image-mean, label_ex, verbose=0)
+        loss, acc = model.evaluate(image - mean, label_ex, verbose=0)
         print('Test loss:', loss)
         print('Test accuracy:', acc)
         accuracy.write(i + 1, 0, model_name)
@@ -253,7 +258,7 @@ if __name__ == '__main__':
         accuracy.write(i + 1, 2, acc)
         # table = model_file.add_sheet(worksheet_name[i])
         for l, adv_name in enumerate(adv_list):
-            table.write(0, l+1, adv_name)
+            table.write(0, l + 1, adv_name)
         for j, name in enumerate(sorted(model_list_adv)):
             print("Using image from model: %s\n" % name)
             # if name == "attack/cifar10_ResNet20v1_model.194":
@@ -263,17 +268,16 @@ if __name__ == '__main__':
             for adv_method in adv_list:
                 adv_img = read_adv_img(name, adv_method)
                 among_adv, among_all = eval_adv(model, img, adv_img, pred, label, name, adv_method, avg_val_max)
-                efficiency.append(among_adv/among_all)
+                efficiency.append(among_adv / among_all)
                 if model_name == name:
-                    adv_result_dict[adv_method].append(among_adv/among_all)
+                    adv_result_dict[adv_method].append(among_adv / among_all)
                 else:
-                    adv_result_cross_dict[adv_method].append(among_adv/among_all)
-            table.write(j+1, 0, name)
+                    adv_result_cross_dict[adv_method].append(among_adv / among_all)
+            table.write(j + 1, 0, name)
             for k, rate in enumerate(efficiency):
-                table.write(j+1, k+1, rate)
-        model_file.save(os.path.join(save_dir, model_name.split('/')[1] + '.xls'))
-    file.save(os.path.join(save_dir, 'Accuracy_baseline.xls'))
-
+                table.write(j + 1, k + 1, rate)
+        model_file.save(os.path.join(save_dir, adv_file_dir, model_name.split('/')[1] + '.xls'))
+    file.save(os.path.join(save_dir, adv_file_dir, 'Accuracy_baseline.xls'))
 
     txt_record.write("Cross results\n")
     for key, rate in adv_result_cross_dict.items():

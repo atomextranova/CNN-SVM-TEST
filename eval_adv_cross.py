@@ -227,6 +227,8 @@ if __name__ == '__main__':
     adv_result_cross_dict = {key: [] for key in adv_list}
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
+    if not os.path.isdir(os.path.join(save_dir, adv_file_dir)):
+        os.makedirs(os.path.join(save_dir, adv_file_dir))
     for i, model_name in enumerate(sorted(model_list)):
         model_file = xlwt.Workbook(encoding = "utf-8")
         table = model_file.add_sheet('result')
@@ -259,8 +261,8 @@ if __name__ == '__main__':
             table.write(j+1, 0, name)
             for k, rate in enumerate(efficiency):
                 table.write(j+1, k+1, rate)
-        model_file.save(os.path.join(save_dir, model_name.split('/')[1] + '.xls'))
-    file.save(os.path.join(save_dir, 'Accuracy_baseline.xls'))
+        model_file.save(os.path.join(save_dir, adv_file_dir,model_name.split('/')[1] + '.xls'))
+    file.save(os.path.join(save_dir, adv_file_dir, 'Accuracy_baseline.xls'))
 
 
     txt_record.write("Cross results\n")
