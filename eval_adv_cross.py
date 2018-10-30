@@ -172,7 +172,7 @@ if __name__ == '__main__':
 
     file_dir = sys.argv[1]
     file_name = [os.path.splitext(file)[0] for file in os.listdir(file_dir) if os.path.isfile(os.path.join(file_dir, file))
-                  and file.startswith('cifar') and 'svm' not in file
+                  and file.startswith('cifar')
                   and file.endswith('.h5')]
 
     adv_file_dir = sys.argv[2]
