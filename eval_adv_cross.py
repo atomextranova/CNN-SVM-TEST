@@ -148,7 +148,7 @@ def read_adv_img(model, adv):
         with h5py.File(adv_file_dir+"/adv_" + adv + "_" + "gap.h5", 'r') as hf:
             return hf['adv'][:]
     else:
-        with h5py.File(adv_file_dir+"/adv_" + adv + "_" + model.split("\\")[1] + "_gap.h5", 'r') as hf:
+        with h5py.File(adv_file_dir+"/adv_" + adv + "_" + model.split("/")[1] + "_gap.h5", 'r') as hf:
             return hf['adv'][:]
 
 def condition(worksheet_name):
@@ -160,16 +160,15 @@ def condition(worksheet_name):
 
 if __name__ == '__main__':
     txt_record = open("evaluation_results.txt", 'w')
-    generate_orig()
-    image, label, mean = read_orig()
+    # generate_orig()
+    image, _, label = read_orig()
     label_ex = keras.utils.to_categorical(label, 10)
 
     img = image[::10]
     label = label[::10]
 
-    # # label = label[::10]
-    # with h5py.File("mean.h5", "r") as hf:
-    #     mean = hf['mean'][:]
+    with h5py.File("mean.h5", "r") as hf:
+        mean = hf['mean'][:]
 
     file_dir = sys.argv[1]
     file_name = [os.path.splitext(file)[0] for file in os.listdir(file_dir) if os.path.isfile(os.path.join(file_dir, file))
