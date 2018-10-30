@@ -250,7 +250,7 @@ if __name__ == '__main__':
             efficiency = []
             for adv_method in adv_list:
                 adv_img = read_adv_img(name, adv_method)
-                among_adv, among_all = eval_adv(model, img, adv_img, pred, label, name, adv_method, avg_val_max)
+                among_adv, among_all = eval_adv(model, img, adv_img, pred, label, name, adv_method)
                 efficiency.append(among_adv/among_all)
                 if model_name == name:
                     adv_result_dict[adv_method].append(among_adv/among_all)
