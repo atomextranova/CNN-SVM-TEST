@@ -152,7 +152,7 @@ def read_adv_img(model, adv):
         with h5py.File(adv_file_dir + "/adv_" + adv + "_" + "gap.h5", 'r') as hf:
             return hf['adv'][:]
     else:
-        with h5py.File(adv_file_dir + "/adv_" + adv + "_" + model.split("/")[1] + "_gap.h5", 'r') as hf:
+        with h5py.File(adv_file_dir + "/adv_" + adv + "_" + model.split("\\")[1] + "_gap.h5", 'r') as hf:
             return hf['adv'][:]
 
 
@@ -191,7 +191,13 @@ if __name__ == '__main__':
 
     model_list = [os.path.join(file_dir, file) for file in file_name]
     model_list_adv = [os.path.join(adv_file_dir, file) for file in adv_file_name]
-    model_list.extend(model_list_adv)
+
+    extra = sys.argv[3]
+    file_extra = [os.path.splitext(file)[0] for file in os.listdir(extra) if os.path.isfile(os.path.join(extra, file))
+                  and file.startswith('ens')
+                  and file.endswith('.h5')]
+    model_list_extra = [os.path.join(adv_file_dir, file) for file in file_extra]
+    model_list = model_list_extra
 
     adv_file_name_cifar = [os.path.splitext(file)[0] for file in os.listdir(adv_file_dir) if
                            os.path.isfile(os.path.join(adv_file_dir, file))
@@ -232,12 +238,12 @@ if __name__ == '__main__':
             avg_val_max = max(avg_val, avg_val_max)
     print(avg_val_max)
 
-    file = xlwt.Workbook(encoding="utf-8")
+    # file = xlwt.Workbook(encoding="utf-8")
     save_dir = 'evaluation_result_same'
     # file_real_number = xlwt.Workbook(encoding = "utf-8")
-    accuracy = file.add_sheet("Accuracy base line")
-    accuracy.write(0, 1, "Loss")
-    accuracy.write(0, 2, "Accuracy")
+    # accuracy = file.add_sheet("Accuracy base line")
+    # accuracy.write(0, 1, "Loss")
+    # accuracy.write(0, 2, "Accuracy")
     adv_result_dict = {key: [] for key in adv_list}
     adv_result_cross_dict = {key: [] for key in adv_list}
     if not os.path.isdir(save_dir):
@@ -250,12 +256,12 @@ if __name__ == '__main__':
         model = keras.models.load_model(model_name + ".h5")
         pred = model.predict(x_test[::10])
         print("--- Evaluation: %s, started ---\n" % (model_name))
-        loss, acc = model.evaluate(image - mean, label_ex, verbose=0)
-        print('Test loss:', loss)
-        print('Test accuracy:', acc)
-        accuracy.write(i + 1, 0, model_name)
-        accuracy.write(i + 1, 1, loss)
-        accuracy.write(i + 1, 2, acc)
+        # loss, acc = model.evaluate(image - mean, label_ex, verbose=0)
+        # print('Test loss:', loss)
+        # print('Test accuracy:', acc)
+        # accuracy.write(i + 1, 0, model_name)
+        # accuracy.write(i + 1, 1, loss)
+        # accuracy.write(i + 1, 2, acc)
         # table = model_file.add_sheet(worksheet_name[i])
         for l, adv_name in enumerate(adv_list):
             table.write(0, l + 1, adv_name)
@@ -277,7 +283,7 @@ if __name__ == '__main__':
             for k, rate in enumerate(efficiency):
                 table.write(j + 1, k + 1, rate)
         model_file.save(os.path.join(save_dir, adv_file_dir, model_name.split('/')[1] + '.xls'))
-    file.save(os.path.join(save_dir, adv_file_dir, 'Accuracy_baseline.xls'))
+    # file.save(os.path.join(save_dir, adv_file_dir, 'Accuracy_baseline.xls'))
 
     txt_record.write("Cross results\n")
     for key, rate in adv_result_cross_dict.items():
