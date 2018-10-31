@@ -77,6 +77,7 @@ def generate_orig():
 # def eval_adv(model, name, mean, image, pred, label):
 def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name, avg_val_max):
     attack = 0
+    print(np.sum(np.abs(adv_img - img)))
     avg_val = np.sum(np.abs(adv_img - image)) / adv_img.size * 255
     factor = avg_val_max / avg_val
     noise = (adv_img - image) * factor
@@ -152,7 +153,7 @@ def read_adv_img(model, adv):
         with h5py.File(adv_file_dir + "/adv_" + adv + "_" + "gap.h5", 'r') as hf:
             return hf['adv'][:]
     else:
-        with h5py.File(adv_file_dir + "/adv_" + adv + "_" + model.split("\\")[1] + "_gap.h5", 'r') as hf:
+        with h5py.File(adv_file_dir + "/adv_" + adv + "_" + model.split("/")[1] + "_gap.h5", 'r') as hf:
             return hf['adv'][:]
 
 
@@ -192,12 +193,15 @@ if __name__ == '__main__':
     model_list = [os.path.join(file_dir, file) for file in file_name]
     model_list_adv = [os.path.join(adv_file_dir, file) for file in adv_file_name]
 
-    extra = sys.argv[3]
-    file_extra = [os.path.splitext(file)[0] for file in os.listdir(extra) if os.path.isfile(os.path.join(extra, file))
-                  and file.startswith('ens')
-                  and file.endswith('.h5')]
-    model_list_extra = [os.path.join(adv_file_dir, file) for file in file_extra]
-    model_list = model_list_extra
+    try:
+        extra = sys.argv[3]
+        file_extra = [os.path.splitext(file)[0] for file in os.listdir(extra) if os.path.isfile(os.path.join(extra, file))
+                      and file.startswith('ens')
+                      and file.endswith('.h5')]
+        model_list_extra = [os.path.join(adv_file_dir, file) for file in file_extra]
+        model_list = model_list_extra
+    except:
+        pass
 
     adv_file_name_cifar = [os.path.splitext(file)[0] for file in os.listdir(adv_file_dir) if
                            os.path.isfile(os.path.join(adv_file_dir, file))
@@ -221,7 +225,7 @@ if __name__ == '__main__':
     # adv_list = ['DeepFool_L_2', 'LBGFS', 'Iter_Grad', 'Iter_GradSign',
     #             'Local_search', 'Single_Pixel', 'DeepFool_L_INF', 'Gaussian_Blur']
 
-    adv_list = ['DeepFool_L_2', 'DeepFool_L_INF']
+    adv_list = ['DeepFool_L_2']
     # ,'DeepFool_L_INF', 'Gaussian_Blur',  'Iter_Grad']
 
     # adv_list = ['DeepFool_L_2',
@@ -232,10 +236,9 @@ if __name__ == '__main__':
 
     avg_val_max = 0
     for j, name in enumerate(model_list_adv):
-        for adv_method in adv_list:
-            adv_img = read_adv_img(name, adv_method)
-            avg_val = np.sum(np.abs(adv_img - img)) / adv_img.size * 255
-            avg_val_max = max(avg_val, avg_val_max)
+        adv_img = read_adv_img(name, adv_list[0])
+        avg_val = np.sum(np.abs(adv_img - img)) / adv_img.size * 255
+        avg_val_max = max(avg_val, avg_val_max)
     print(avg_val_max)
 
     # file = xlwt.Workbook(encoding="utf-8")
