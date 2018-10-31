@@ -77,7 +77,6 @@ def generate_orig():
 # def eval_adv(model, name, mean, image, pred, label):
 def eval_adv(model, image, adv_img, pred_orig, label, model_name, adv_name, avg_val_max):
     attack = 0
-    print(np.sum(np.abs(adv_img - img)))
     avg_val = np.sum(np.abs(adv_img - image)) / adv_img.size * 255
     factor = avg_val_max / avg_val
     noise = (adv_img - image) * factor
@@ -179,7 +178,7 @@ if __name__ == '__main__':
     file_dir = sys.argv[1]
     file_name = [os.path.splitext(file)[0] for file in os.listdir(file_dir) if
                  os.path.isfile(os.path.join(file_dir, file))
-                 and file.startswith('cifar')
+                 and file.startswith('cifar') and 'SVM' not in file
                  and file.endswith('.h5')]
 
     adv_file_dir = sys.argv[2]
@@ -201,14 +200,14 @@ if __name__ == '__main__':
         model_list_extra = [os.path.join(adv_file_dir, file) for file in file_extra]
         model_list = model_list_extra
     except:
-        pass
+        model_list.extend(model_list_adv)
 
     adv_file_name_cifar = [os.path.splitext(file)[0] for file in os.listdir(adv_file_dir) if
                            os.path.isfile(os.path.join(adv_file_dir, file))
                            and file.startswith('cifar')
                            and file.endswith('.h5')]
     model_list_adv_cifar = [os.path.join(adv_file_dir, file) for file in adv_file_name_cifar]
-    # model_list_adv.extend(model_list_adv_cifar)
+    model_list_adv.extend(model_list_adv_cifar)
 
     worksheet_name = list(map(condition, file_name))
     worksheet_name.extend(list(map(condition, adv_file_name)))
