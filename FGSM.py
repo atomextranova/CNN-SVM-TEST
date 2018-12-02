@@ -7,7 +7,8 @@ import numpy as np
 from collections import Iterable
 import logging
 import time
-
+from operator import itemgetter
+import scipy.misc
 
 class Adversarial:
 
@@ -45,7 +46,7 @@ class Adversarial:
 
     @staticmethod
     def root_mean_square_deviation(orig_image, adv_image):
-        return np.sqrt(np.sum(np.square(orig_image - adv_image) / np.array(orig_image.size)))
+        return np.sqrt(np.sum(np.square(orig_image - adv_image) / np.array(orig_image.size))) * 255
 
     # @staticmethod
     # def l2_distance():
@@ -62,13 +63,13 @@ class Adversarial:
     def deepfool_base(self, image, label):
         pass
 
-
-
-    def _iterative_gradient_base(self, image, label, epsilons=None, epsilon_number=51, epsilon_space=(0, 0.1),
-                                 steps=100, preprocessing=(0, 0, 0), clip=True, val_range=(0, 1), sign=False,
+    def _iterative_gradient_base(self, image, label, epsilons=None, epsilon_number=101, epsilon_space=(0, 0.1),
+                                 steps=10, preprocessing=(0, 0, 0), clip=True, val_range=(0, 1), sign=False,
                                  optimize=False):
-        image = np.expand_dims(image, axis=0) - preprocessing
-        if self.predict(image) != label:
+
+        processed_image = np.expand_dims(image - preprocessing, axis=0)
+
+        if self.predict(processed_image) != label:
             logging.warning('Already wrong. Not adding any noise')
             return None
         else:
@@ -76,31 +77,39 @@ class Adversarial:
             min_val_eps, max_val_eps = epsilon_space
             if not isinstance(epsilons, Iterable):
                 epsilons = np.linspace(min_val_eps, max_val_eps, num=epsilon_number)[1:]
-
+            adv_list = []
             for epsilon in epsilons:
-                perturbed_image = image
+                perturbed_image = processed_image
                 for _ in range(steps):
-                    cur_grad = self.gradient(perturbed_image, label)
+                    cur_grad = self.gradient(perturbed_image, [label])
                     if sign:
-                        cur_grad = np.sign(cur_grad)
+                        cur_grad = np.sign(cur_grad) * (max_val - min_val)
                     perturbed_image += cur_grad * epsilon
                     if clip:
                         perturbed_image = np.clip(perturbed_image + preprocessing, min_val, max_val) - preprocessing
-                    if label != self.predict(perturbed_image):
-                        return np.squeeze(perturbed_image + preprocessing, axis=0)
-            logging.warning('Does not found adversarial given current settings')
-            return None
+                    if label != self.predict(perturbed_image)[0]:
+                        adv_image = np.squeeze(perturbed_image + preprocessing, axis=0)
 
-    def iterative_gradient_sign_method(self, image, label, epsilons=None, epsilon_number=51, epsilon_space=(0, 0.1),
-                                       steps=100, preprocessing=(0, 0, 0), clip=True, val_range=(0, 1), optimize=False):
+                        adv_list.append((adv_image, self.distance(image, adv_image)))
+            if len(adv_list) != 0:
+                adv_img, distance = min(adv_list, key=itemgetter(1))
+                print(distance)
+                scipy.misc.imsave('{}.jpg'.format('pre'), adv_img)
+                return adv_img
+            else:
+                logging.warning('Does not found adversarial given current settings. Return None.')
+                return None
+
+    def iterative_gradient_sign_method(self, image, label, epsilons=None, epsilon_number=101, epsilon_space=(0, 0.1),
+                                       steps=10, preprocessing=(0, 0, 0), clip=True, val_range=(0, 1), optimize=False):
         return self._iterative_gradient_base(image, label, epsilons=epsilons, epsilon_number=epsilon_number,
                                              epsilon_space=epsilon_space,
                                              steps=steps, preprocessing=preprocessing, clip=clip, sign=True,
                                              val_range=val_range,
                                              optimize=optimize)
 
-    def iterative_gradient_method(self, image, label, epsilons=None, epsilon_number=51, epsilon_space=(0, 0.1),
-                                  steps=100, preprocessing=(0, 0, 0), clip=True, val_range=(0, 1), optimize=False):
+    def iterative_gradient_method(self, image, label, epsilons=None, epsilon_number=101, epsilon_space=(0, 0.1),
+                                  steps=10, preprocessing=(0, 0, 0), clip=True, val_range=(0, 1), optimize=False):
         return self._iterative_gradient_base(image, label, epsilons=epsilons, epsilon_number=epsilon_number,
                                              epsilon_space=epsilon_space,
                                              steps=steps, preprocessing=preprocessing, clip=clip, sign=False,
@@ -128,12 +137,15 @@ class Adversarial:
     #     logging.warning('Does not found adversarial given current settings')
     #     return None
 
-    def iterative_gradient_method_ensemble(self, image, label, epsilons=None, epsilon_number=101,
+    def distance(self, image, adv_image):
+        return np.sum(np.abs(image-np.array(adv_image))) * 255 / np.array(adv_image).size
+
+    def iterative_gradient_method_ensemble(self, image, label, epsilons=None, epsilon_number=100,
                                            epsilon_space=(0, 0.1),
                                            steps=1000, preprocessing=(0, 0, 0), clip=True, val_range=(0, 1), sign=False,
                                            optimize=False):
-        image = np.expand_dims(image, axis=0) - preprocessing
-        if self.predict(image) != label:
+        processed_image = np.expand_dims(image, axis=0) - preprocessing
+        if self.predict(processed_image) != label:
             logging.warning('Already wrong. Not adding any noise. Return None')
             return None
         else:
@@ -146,9 +158,9 @@ class Adversarial:
             grad_list = []
             for child_model in model_list:
                 grad_list.append(Adversarial.make_gradient(child_model))
-
+            adv_list = []
             for epsilon in epsilons:
-                perturbed_image = image
+                perturbed_image = processed_image
                 for _ in range(steps):
                     cur_grad = 0
                     grad_num = 0
@@ -164,9 +176,14 @@ class Adversarial:
                     if clip:
                         perturbed_image = np.clip(perturbed_image + preprocessing, min_val, max_val) - preprocessing
                     if self.predict(perturbed_image) != label:
-                        return np.squeeze(perturbed_image + preprocessing, axis=0)
-            logging.warning('Does not found adversarial given current settings. Return None.')
-            return None
+                        adv_image = np.squeeze(perturbed_image + preprocessing, axis=0)
+                        adv_list.append((adv_image, self.distance(image, adv_image)))
+            if len(adv_list) != 0:
+                adv_img, distance = max(adv_list, key=itemgetter(1))
+                return adv_img
+            else:
+                logging.warning('Does not found adversarial given current settings. Return None.')
+                return None
 
     # def iterative_gradient_method_ensemble(self, image, label, epsilons=None, epsilon_number=101,
     #                                        epsilon_space=(0, 0.1),
@@ -229,13 +246,13 @@ def read_model(file_dir, key, svm=False):
 
 
 def read_orig(gap=1):
-    with  h5py.File('attack/orig.h5') as hf:
+    with  h5py.File('orig.h5') as hf:
         # value = list(hf.values())
         # print(value)
-        return hf['orig'][::gap], hf['pred'][::gap], hf['label'][::gap]
+        return hf['image'][::gap], hf['label'][::gap], hf['mean'][:]
 
 
-def generate_adv_for_list(model_list, file_dir, ens=False):
+def generate_adv_for_list(model_list, file_dir, ens=False, option='Iter_Grad'):
     for model in model_list:
         file = open(os.path.join(file_dir, 'adv_{}_{}_gap.txt'.format('Iter_Grad', model.name)), 'w')
         print('--- Model {} started ---'.format(model.name))
@@ -246,7 +263,12 @@ def generate_adv_for_list(model_list, file_dir, ens=False):
         success = 0
         success_ensemble = 0
         for img, lab in zip(image, label):
-            adv_image = model_adv.iterative_gradient_method(image=img + mean, label=lab, preprocessing=mean)
+            if option == 'Iter_Grad':
+                adv_image = model_adv.iterative_gradient_method(image=img+mean, label=lab, preprocessing=mean)
+            elif option == 'Iter_GradSign':
+                adv_image = model_adv.iterative_gradient_sign_method(image=img+mean, label=lab, preprocessing=mean)
+            else:
+                raise NotImplementedError
             if adv_image is None:
                 adv_list.append(img)
                 logging.warning('Invalid adversarial graph')
@@ -254,16 +276,16 @@ def generate_adv_for_list(model_list, file_dir, ens=False):
                 adv_list.append(adv_image)
                 if model_adv.predict(np.expand_dims(adv_image - mean, axis=0)) != lab:
                     success += 1
-            if ens:
-                adv_image_ensemble = model_adv.iterative_gradient_method_ensemble(image=img + mean, label=lab,
-                                                                                  preprocessing=mean)
-                if adv_image_ensemble is None:
-                    adv_list_ensemble.append(img)
-                    logging.warning('Invalid adversarial graph')
-                else:
-                    adv_list_ensemble.append(adv_image_ensemble)
-                    if model_adv.predict(np.expand_dims(adv_image - mean, axis=0)) != lab:
-                        success_ensemble += 1
+            # if ens:
+            #     adv_image_ensemble = model_adv.iterative_gradient_method_ensemble(processed_image=img+mean, label=lab,
+            #                                                                       preprocessing=mean)
+            #     if adv_image_ensemble is None:
+            #         adv_list_ensemble.append(img)
+            #         logging.warning('Invalid adversarial graph')
+            #     else:
+            #         adv_list_ensemble.append(adv_image_ensemble)
+            #         if model_adv.predict(np.expand_dims(adv_image - mean, axis=0)) != lab:
+            #             success_ensemble += 1
 
         file.write('Sum RMSD: {} \n'.format(Adversarial.root_mean_square_deviation(image + mean, np.array(adv_list))))
         file.write(str(np.sum(np.abs(image+mean-np.array(adv_list))) / np.array(adv_list).size))
@@ -275,23 +297,23 @@ def generate_adv_for_list(model_list, file_dir, ens=False):
         completion_msg = "--- {} takes {} seconds ---\n".format(model.name, (time.time() - start))
         print(completion_msg)
         file.close()
-
-        with h5py.File(os.path.join(file_dir, 'adv_{}_{}_gap.h5'.format('Iter_Grad', model.name)), "w") as hf:
-            hf.create_dataset(name='sum', data=np.array(adv_list))
-            hf.create_dataset(name='ens', data=np.array(adv_list_ensemble))
+        print(model_adv.distance(image + mean, adv_list))
+        with h5py.File(os.path.join(file_dir, 'adv_{}_{}_gap.h5'.format(option, model.name)), "w") as hf:
+            hf.create_dataset(name='adv', data=np.array(adv_list))
+            hf.create_dataset(name='adv_ens', data=np.array(adv_list_ensemble))
 
 
 if __name__ == '__main__':
-    with h5py.File("attack/mean.h5", "r") as hf:
-        mean = np.array(hf['mean'][:])
+    # with h5py.File("attack/mean.h5", "r") as hf:
+    #     mean = np.array(hf['mean'][:])
 
-    image, _, label = read_orig(10)
-
+    image, label, mean = read_orig(10000)
     file_dir = sys.argv[1]
     cnn_list = read_model(file_dir, 'cifar')
 
-    ens_list = read_model(file_dir, 'ens')
+    # ens_list = read_model(file_dir, 'ens')
     generate_adv_for_list(cnn_list, file_dir)
-    generate_adv_for_list(ens_list, file_dir)
+    generate_adv_for_list(cnn_list, file_dir, False, 'Iter_GradSign')
+    # generate_adv_for_list(ens_list, file_dir)
 
     # svm_list = read_model(file_dir, 'cifar', True)
