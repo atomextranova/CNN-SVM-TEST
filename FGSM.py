@@ -10,6 +10,8 @@ import time
 from operator import itemgetter
 import scipy.misc
 
+count = 0
+
 class Adversarial:
 
     def __init__(self, cur_model, softmax=False, convert_activation=False, label_input=None):
@@ -93,9 +95,9 @@ class Adversarial:
                         adv_list.append((adv_image, self.distance(image, adv_image)))
             if len(adv_list) != 0:
                 adv_img, distance = min(adv_list, key=itemgetter(1))
-                print(distance)
-                scipy.misc.imsave('{}.jpg'.format('pre'), adv_img)
-                return adv_img
+                scipy.misc.imsave('{}.jpg'.format(count), adv_img)
+                count += 1
+                return adv_img, distance
             else:
                 logging.warning('Does not found adversarial given current settings. Return None.')
                 return None
