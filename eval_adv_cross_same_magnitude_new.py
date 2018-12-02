@@ -5,6 +5,7 @@ import numpy as np
 import keras
 import xlwt
 import sys
+import gc
 
 # Load the CIFAR10 data.
 (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
@@ -210,7 +211,7 @@ if __name__ == '__main__':
     worksheet_name.extend(list(map(condition, adv_file_name)))
 
 
-    adv_list = ['DeepFool_L_2', 'DeepFool_L_INF']
+    adv_list = ['DeepFool_L_2']
     # ,'DeepFool_L_INF', 'Gaussian_Blur',  'Iter_Grad']
 
     # adv_list = ['DeepFool_L_2',
@@ -246,6 +247,8 @@ if __name__ == '__main__':
     for adv_method in adv_list:
         table = adv_table_dict[adv_method]
         for i, model_name in enumerate(sorted(model_list)):
+            if i % 5 == 4:
+                gc.collect()
             model = keras.models.load_model(model_name + ".h5")
             pred = model.predict(x_test[::10])
             print("--- Evaluation: %s, started ---\n" % (model_name))
