@@ -314,7 +314,7 @@ if __name__ == '__main__':
     # with h5py.File("attack/mean.h5", "r") as hf:
     #     mean = np.array(hf['mean'][:])
 
-    image, label, mean = read_orig(10000)
+    image, label, mean = read_orig(10)
     file_dir = sys.argv[1]
     cnn_list = read_model(file_dir, 'cifar')
 
