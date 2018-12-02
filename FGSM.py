@@ -73,7 +73,7 @@ class Adversarial:
 
         if self.predict(processed_image) != label:
             logging.warning('Already wrong. Not adding any noise')
-            return None
+            return None, 0
         else:
             min_val, max_val = val_range
             min_val_eps, max_val_eps = epsilon_space
@@ -100,7 +100,7 @@ class Adversarial:
                 return adv_img, distance
             else:
                 logging.warning('Does not found adversarial given current settings. Return None.')
-                return None
+                return None, 0
 
     def iterative_gradient_sign_method(self, image, label, epsilons=None, epsilon_number=101, epsilon_space=(0, 0.1),
                                        steps=10, preprocessing=(0, 0, 0), clip=True, val_range=(0, 1), optimize=False):
@@ -149,7 +149,7 @@ class Adversarial:
         processed_image = np.expand_dims(image, axis=0) - preprocessing
         if self.predict(processed_image) != label:
             logging.warning('Already wrong. Not adding any noise. Return None')
-            return None
+            return None, 0
         else:
             min_val, max_val = val_range
             min_val_eps, max_val_eps = epsilon_space
@@ -185,7 +185,7 @@ class Adversarial:
                 return adv_img
             else:
                 logging.warning('Does not found adversarial given current settings. Return None.')
-                return None
+                return None, 0
 
     # def iterative_gradient_method_ensemble(self, image, label, epsilons=None, epsilon_number=101,
     #                                        epsilon_space=(0, 0.1),
@@ -264,18 +264,21 @@ def generate_adv_for_list(model_list, file_dir, ens=False, option='Iter_Grad'):
         adv_list_ensemble = []
         success = 0
         success_ensemble = 0
+        distance_list = []
         for img, lab in zip(image, label):
             if option == 'Iter_Grad':
-                adv_image = model_adv.iterative_gradient_method(image=img+mean, label=lab, preprocessing=mean)
+                adv_image, distance = model_adv.iterative_gradient_method(image=img+mean, label=lab, preprocessing=mean)
             elif option == 'Iter_GradSign':
-                adv_image = model_adv.iterative_gradient_sign_method(image=img+mean, label=lab, preprocessing=mean)
+                adv_image, distance = model_adv.iterative_gradient_sign_method(image=img+mean, label=lab, preprocessing=mean)
             else:
                 raise NotImplementedError
             if adv_image is None:
                 adv_list.append(img)
+                distance_list.append(0)
                 logging.warning('Invalid adversarial graph')
             else:
                 adv_list.append(adv_image)
+                distance_list.append(distance)
                 if model_adv.predict(np.expand_dims(adv_image - mean, axis=0)) != lab:
                     success += 1
             # if ens:
@@ -288,13 +291,15 @@ def generate_adv_for_list(model_list, file_dir, ens=False, option='Iter_Grad'):
             #         adv_list_ensemble.append(adv_image_ensemble)
             #         if model_adv.predict(np.expand_dims(adv_image - mean, axis=0)) != lab:
             #             success_ensemble += 1
-
-        file.write('Sum RMSD: {} \n'.format(Adversarial.root_mean_square_deviation(image + mean, np.array(adv_list))))
-        file.write(str(np.sum(np.abs(image+mean-np.array(adv_list))) / np.array(adv_list).size))
-        if ens:
-            file.write('Ensemble RMSD: {} \n'.format(
-                Adversarial.root_mean_square_deviation(image + mean, np.array(adv_list_ensemble))))
-            file.write(str(np.sum(np.abs(image + mean - np.array(adv_list_ensemble))) / np.array(adv_list_ensemble).size))
+        avg_distance = np.sum(distance_list) / len(distance_list)
+        print(avg_distance)
+        file.write(avg_distance)
+        # file.write('Sum RMSD: {} \n'.format(Adversarial.root_mean_square_deviation(image + mean, np.array(adv_list))))
+        # file.write(str(np.sum(np.abs(image+mean-np.array(adv_list))) / np.array(adv_list).size))
+        # if ens:
+        #     file.write('Ensemble RMSD: {} \n'.format(
+        #         Adversarial.root_mean_square_deviation(image + mean, np.array(adv_list_ensemble))))
+        #     file.write(str(np.sum(np.abs(image + mean - np.array(adv_list_ensemble))) / np.array(adv_list_ensemble).size))
 
         completion_msg = "--- {} takes {} seconds ---\n".format(model.name, (time.time() - start))
         print(completion_msg)
