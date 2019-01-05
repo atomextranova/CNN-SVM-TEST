@@ -147,13 +147,17 @@ def attack_group(model_adv, process_size, model_name, save_dir, lock, gap):
     # # # print("--- " + str(1) + "takes %s seconds ---\n" % (time.time() - start))
 
 def attack_group_1(model_adv, model_name, save_dir, lock, gap):
-    # start = time.time()
-
-    attack_deep_fool_l2 = foolbox.attacks.DeepFoolL2Attack(model_adv)
-
-    # attack_DFL_INF = foolbox.attacks.DeepFoolLinfinityAttack(model_adv)
-
-    attack_wrapper(save_dir, model_name, attack_deep_fool_l2, "DeepFool_L_2", gap, lock)
+    attack_CW = foolbox.attacks.CarliniWagnerL2Attack(model_adv)
+    attack_wrapper(save_dir, model_name, attack_CW, "CW", gap, lock)
+    # attack_IterGradSign = foolbox.attacks.IterativeGradientSignAttack(model_adv)
+    # attack_wrapper(save_dir, model_name, attack_IterGradSign, "Iter_GradSign", gap, lock)
+    # # start = time.time()
+    #
+    # attack_deep_fool_l2 = foolbox.attacks.DeepFoolL2Attack(model_adv)
+    #
+    # # attack_DFL_INF = foolbox.attacks.DeepFoolLinfinityAttack(model_adv)
+    #
+    # attack_wrapper(save_dir, model_name, attack_deep_fool_l2, "DeepFool_L_2", gap, lock)
     # attack_wrapper(save_dir, model_name, attack_DFL_INF, 'DeepFool_L_INF', gap, lock)
 
     # attack_LBFGSAttack = foolbox.attacks.LBFGSAttack(model_adv)
@@ -258,7 +262,7 @@ if __name__ == "__main__":
             model_names.append(os.path.splitext(model_loc)[0])
             model_dirs.append(model_loc)
         elif os.path.isdir(model_loc):
-            model_files_sub =[file for file in os.listdir(model_loc) if file.startswith('cifar') and file.endswith('.h5')]
+            model_files_sub =[file for file in os.listdir(model_loc) if file.startswith('ens') and file.endswith('.h5')]
             model_names_sub = [os.path.splitext(model_file)[0] for model_file in model_files_sub]
             model_dirs_sub = [os.path.join(model_loc, model_file) for model_file in model_files_sub]
             model_names.extend(model_names_sub)
